@@ -1,6 +1,23 @@
+import ButtonBasic from 'components/Buttons/Basic';
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useAudioInputs, useVideosInputs } from './hooks/media-devices';
-import { InputBox, RecordingVideo, RecordPreview } from './styles';
+import { useRequestWebcamAndMicrophonePermissions } from './hooks/permissions';
+import {
+  Container,
+  Footer,
+  FooterLeftSide,
+  FooterRightSide,
+  InputBox,
+  RecordingVideo,
+  RecordPreview,
+  VideoArea,
+} from './styles';
+import { TiArrowDown, TiMicrophoneOutline } from 'react-icons/ti';
+import { BsCameraVideo, BsChevronDown } from 'react-icons/bs';
+import Theme from 'config/theme';
+import RecordingButton from 'components/Buttons/RecordingButton';
+
+const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
 
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -10,10 +27,13 @@ function App() {
   const [selectedAudioInput, setSelectedAudioInput] = useState<MediaDeviceInfo | null>(null);
   const [selectedVideoInputID, setSelectedVideoInputID] = useState<string>('screen');
   const [isDisableAudio, setIsDisableAudio] = useState(false);
+  const [isToRecordScreenAudio, setIsToRecordScreenAudio] = useState(true);
   const [isRecordingRunning, setIsRecordingRunning] = useState(false);
   const [downloadLink, setDownloadLink] = useState<string | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [downloadFileName, setDownloadFileName] = useState('file.webm');
 
+  useRequestWebcamAndMicrophonePermissions();
   const { audioInputs } = useAudioInputs();
   const { videosInputs } = useVideosInputs();
 
@@ -49,6 +69,7 @@ function App() {
     }
 
     const stream = await getStream();
+    console.log(stream.getTracks());
     videoRef.current!.srcObject = stream;
 
     mediaRecorder.current = new MediaRecorder(stream);
@@ -58,12 +79,17 @@ function App() {
     setIsRecordingRunning(true);
 
     async function getStream() {
+      const audio = Boolean(isDisableAudio || !selectedAudioInput) ? false : { deviceId: selectedAudioInput?.deviceId };
+
       if (isScreenRecording) {
-        return await navigator.mediaDevices.getDisplayMedia({ audio: !isDisableAudio, video: true });
+        const userMediaStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: audio });
+        const displayMediaStream = await navigator.mediaDevices.getDisplayMedia({ audio: false, video: true });
+        userMediaStream.getTracks().forEach((t) => displayMediaStream.addTrack(t));
+        return displayMediaStream;
       }
       return await navigator.mediaDevices.getUserMedia({
         video: { deviceId: selectedVideoInputID! },
-        audio: Boolean(isDisableAudio || !selectedAudioInput) ? false : { deviceId: selectedAudioInput?.deviceId },
+        audio: audio,
       });
     }
 
@@ -78,6 +104,7 @@ function App() {
       const url = URL.createObjectURL(blob);
       setDownloadLink(url);
       setIsRecordingRunning(false);
+      setDownloadFileName(`${new Date().toISOString()}.webm`);
       stream.getTracks().forEach((track) => track.stop());
       setRecordingTime(0);
       recordingChunks.current = [];
@@ -90,50 +117,32 @@ function App() {
   }
 
   return (
-    <div>
-      <InputBox>
-        <span>Audio:</span>
-        {audioInputs.length > 0 ? (
-          <>
-            <label htmlFor="audio-checkbox">Desativar Audio</label>
-            <input type="checkbox" id="audio-checkbox" checked={isDisableAudio} onChange={handleIsDisableAudioChange} />
-            <select value={selectedAudioInput?.deviceId} onChange={handleAudioInputChange} disabled={isDisableAudio}>
-              {audioInputs.map((input) => (
-                <option key={input.deviceId} value={input.deviceId}>
-                  {input.label}
-                </option>
-              ))}
-            </select>
-          </>
-        ) : (
-          <span>Nenhuma entrada de audio encontrada</span>
-        )}
-      </InputBox>
-      <InputBox>
-        <span>Vídeo:</span>
-        <select value={selectedVideoInputID} onChange={handleVideoInputChange}>
-          {videosInputs.map((input) => (
-            <option key={input.deviceId} value={input.deviceId}>
-              {input.label}
-            </option>
-          ))}
-          <option value="screen">Própria Tela</option>
-        </select>
-      </InputBox>
-      {isRecordingRunning ? (
-        <button onClick={handleStopRecording}>Parar</button>
-      ) : (
-        <button onClick={handleStartRecordingClick}>Gravar</button>
-      )}
-      {isRecordingRunning && <span>Tempo: {recordingTime}s</span>}
-      {!isRecordingRunning && downloadLink && (
-        <a href={downloadLink} download="file.webm">
-          Download
-        </a>
-      )}
-      <RecordingVideo ref={videoRef} autoPlay style={{ display: isRecordingRunning ? 'initial' : 'none' }} />
-      {!isRecordingRunning && downloadLink && <RecordPreview src={downloadLink} controls />}
-    </div>
+    <Container>
+      <VideoArea>
+        <RecordingVideo />
+      </VideoArea>
+      <Footer>
+        <FooterLeftSide>
+          <ButtonBasic
+            LeftIcon={<TiMicrophoneOutline size={20} color={Theme.pallet.primaryDark} />}
+            label="Audio Device Name"
+            RightIcon={<DownArrayIcon />}
+          />
+          <ButtonBasic
+            LeftIcon={<BsCameraVideo size={20} color={Theme.pallet.primaryDark} />}
+            label="Video Device Name"
+            RightIcon={<DownArrayIcon />}
+          />
+        </FooterLeftSide>
+        <FooterRightSide>
+          <RecordingButton
+            onClick={() => setIsRecordingRunning((state) => !state)}
+            isRecording={isRecordingRunning}
+            currentSeconds={70}
+          />
+        </FooterRightSide>
+      </Footer>
+    </Container>
   );
 }
 
