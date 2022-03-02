@@ -1,6 +1,10 @@
 import Theme from 'config/theme';
 import styled from 'styled-components';
 
+export const AsLink = styled.a`
+  display: block;
+  text-decoration: none;
+`;
 export const ButtonContainer = styled.button`
   background-color: ${Theme.pallet.primaryLight};
   border: none;

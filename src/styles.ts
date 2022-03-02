@@ -17,7 +17,6 @@ export const VideoArea = styled.div`
 export const InputBox = styled.div``;
 
 export const RecordingVideo = styled.video`
-  background-color: #999;
   width: 100%;
   height: 100%;
   border-radius: 5px;
