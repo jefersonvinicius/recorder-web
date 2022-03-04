@@ -7,6 +7,7 @@ import { BsCameraVideo, BsChevronDown, BsDownload } from 'react-icons/bs';
 import { BiMicrophone } from 'react-icons/bi';
 import Theme from 'config/theme';
 import RecordingButton from 'components/Buttons/RecordingButton';
+import ModalSelector from 'components/ModalSelector';
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
 
@@ -28,29 +29,17 @@ function App() {
   const { audioInputs } = useAudioInputs();
   const { videosInputs } = useVideosInputs();
 
-  const isScreenRecording = selectedVideoInputID === 'screen';
-
-  useEffect(() => {
-    if (selectedVideoInputID === 'screen') {
-      navigator.mediaDevices.getDisplayMedia().then(setStream).catch(console.error);
-    } else {
-      navigator.mediaDevices.getUserMedia({ video: { deviceId: selectedVideoInputID } }).then(setStream);
-    }
-
-    function setStream(stream: MediaStream) {
-      videoRef.current!.srcObject = stream;
-    }
-  }, [selectedVideoInputID]);
-
   // useEffect(() => {
-  //   if (!selectedAudioInput && audioInputs.length > 0) {
-  //     setSelectedAudioInput(audioInputs[0]);
+  //   if (selectedVideoInputID === 'screen') {
+  //     navigator.mediaDevices.getDisplayMedia().then(setStream).catch(console.error);
+  //   } else {
+  //     navigator.mediaDevices.getUserMedia({ video: { deviceId: selectedVideoInputID } }).then(setStream);
   //   }
 
-  //   if (!selectedVideoInputID && videosInputs.length > 0) {
-  //     setSelectedVideoInputID(videosInputs[0].deviceId);
+  //   function setStream(stream: MediaStream) {
+  //     videoRef.current!.srcObject = stream;
   //   }
-  // }, [audioInputs, selectedAudioInput, selectedVideoInputID, videosInputs]);
+  // }, [selectedVideoInputID]);
 
   function handleAudioInputChange(event: ChangeEvent<HTMLSelectElement>) {
     const selectedDeviceId = event.target.value;
@@ -74,21 +63,6 @@ function App() {
     mediaRecorder.current.addEventListener('stop', handleMediaRecorderStop);
     mediaRecorder.current.start(1000);
     setIsRecordingRunning(true);
-
-    // async function getStream() {
-    //   const audio = Boolean(isDisableAudio || !selectedAudioInput) ? false : { deviceId: selectedAudioInput?.deviceId };
-
-    //   if (isScreenRecording) {
-    //     const userMediaStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: audio });
-    //     const displayMediaStream = await navigator.mediaDevices.getDisplayMedia({ audio: false, video: true });
-    //     userMediaStream.getTracks().forEach((t) => displayMediaStream.addTrack(t));
-    //     return displayMediaStream;
-    //   }
-    //   return await navigator.mediaDevices.getUserMedia({
-    //     video: { deviceId: selectedVideoInputID! },
-    //     audio: audio,
-    //   });
-    // }
 
     function handleMediaRecorderDataAvailable(event: BlobEvent) {
       const chunk = event.data;
@@ -149,6 +123,14 @@ function App() {
           />
         </FooterRightSide>
       </Footer>
+      <ModalSelector
+        isOpen={true}
+        selectedValue={selectedAudioInput?.deviceId ?? ''}
+        items={audioInputs}
+        textAttr="label"
+        valueAttr="deviceId"
+        onSelect={console.log}
+      />
     </Container>
   );
 }
