@@ -34,7 +34,16 @@ export function useAudioInputs() {
   return { audioInputs: devices, ...rest };
 }
 
+export const screenDevice: MediaDeviceInfo = {
+  kind: 'videoinput',
+  deviceId: 'screen',
+  label: 'Tela',
+  groupId: '',
+  toJSON: () => JSON.stringify(screenDevice),
+};
+
 export function useVideosInputs() {
   const { devices, ...rest } = useDevicesSelector('videoinput');
-  return { videosInputs: devices, ...rest };
+
+  return { videosInputs: [screenDevice, ...devices], ...rest };
 }

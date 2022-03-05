@@ -13,8 +13,7 @@ type Props = {
 
 export default function Button({ label, LeftIcon, RightIcon, onClick, asLink, href, filenameDownload }: Props) {
   const content = useMemo(() => {
-    const onClickFn = asLink ? onClick : () => {};
-
+    const onClickFn = asLink ? () => {} : onClick;
     return (
       <ButtonContainer onClick={onClickFn}>
         {LeftIcon && <div>{LeftIcon}</div>}

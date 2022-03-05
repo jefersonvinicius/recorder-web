@@ -1,6 +1,6 @@
 import ButtonBasic from 'components/Buttons/Basic';
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { useAudioInputs, useVideosInputs } from './hooks/media-devices';
+import { screenDevice, useAudioInputs, useVideosInputs } from './hooks/media-devices';
 import { useRequestWebcamAndMicrophonePermissions } from './hooks/permissions';
 import { Container, Footer, FooterLeftSide, FooterRightSide, RecordingVideo, VideoArea } from './styles';
 import { BsCameraVideo, BsChevronDown, BsDownload } from 'react-icons/bs';
@@ -8,6 +8,7 @@ import { BiMicrophone } from 'react-icons/bi';
 import Theme from 'config/theme';
 import RecordingButton from 'components/Buttons/RecordingButton';
 import ModalSelector from 'components/ModalSelector';
+import MediaDeviceSelector from 'components/MediaDeviceSelector';
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
 
@@ -16,8 +17,10 @@ function App() {
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const recordingChunks = useRef<Blob[]>([]);
 
+  const [videoInputSelectorIsOpen, setVideoInputSelectorIsOpen] = useState(false);
   const [selectedAudioInput, setSelectedAudioInput] = useState<MediaDeviceInfo | null>(null);
   const [selectedVideoInputID, setSelectedVideoInputID] = useState<string>('screen');
+  const [selectedVideo, setSelectedVideo] = useState<MediaDeviceInfo>(screenDevice);
   const [isDisableAudio, setIsDisableAudio] = useState(false);
   const [isToRecordScreenAudio, setIsToRecordScreenAudio] = useState(true);
   const [isRecordingRunning, setIsRecordingRunning] = useState(false);
@@ -29,26 +32,19 @@ function App() {
   const { audioInputs } = useAudioInputs();
   const { videosInputs } = useVideosInputs();
 
-  // useEffect(() => {
-  //   if (selectedVideoInputID === 'screen') {
-  //     navigator.mediaDevices.getDisplayMedia().then(setStream).catch(console.error);
-  //   } else {
-  //     navigator.mediaDevices.getUserMedia({ video: { deviceId: selectedVideoInputID } }).then(setStream);
-  //   }
+  useEffect(() => {
+    mediaRecorder.current?.stop();
 
-  //   function setStream(stream: MediaStream) {
-  //     videoRef.current!.srcObject = stream;
-  //   }
-  // }, [selectedVideoInputID]);
+    if (selectedVideo.deviceId === 'screen') {
+      navigator.mediaDevices.getDisplayMedia().then(setStream).catch(console.error);
+    } else {
+      navigator.mediaDevices.getUserMedia({ video: { deviceId: selectedVideo.deviceId } }).then(setStream);
+    }
 
-  function handleAudioInputChange(event: ChangeEvent<HTMLSelectElement>) {
-    const selectedDeviceId = event.target.value;
-    setSelectedAudioInput(audioInputs.find((input) => input.deviceId === selectedDeviceId) ?? null);
-  }
-
-  function handleVideoInputChange(event: ChangeEvent<HTMLSelectElement>) {
-    setSelectedVideoInputID(event.target.value);
-  }
+    function setStream(stream: MediaStream) {
+      videoRef.current!.srcObject = stream;
+    }
+  }, [selectedVideo]);
 
   async function handleStartRecordingClick() {
     if (!selectedVideoInputID) {
@@ -102,8 +98,9 @@ function App() {
           />
           <ButtonBasic
             LeftIcon={<BsCameraVideo size={20} color={Theme.pallet.primaryDark} />}
-            label={selectedVideoInputID === 'screen' ? 'Tela' : selectedVideoInputID}
+            label={selectedVideo?.label ?? ''}
             RightIcon={<DownArrayIcon />}
+            onClick={() => setVideoInputSelectorIsOpen(true)}
           />
           {downloadLink && (
             <ButtonBasic
@@ -123,13 +120,11 @@ function App() {
           />
         </FooterRightSide>
       </Footer>
-      <ModalSelector
-        isOpen={true}
-        selectedValue={selectedAudioInput?.deviceId ?? ''}
-        items={audioInputs}
-        textAttr="label"
-        valueAttr="deviceId"
-        onSelect={console.log}
+      <MediaDeviceSelector
+        isOpen={videoInputSelectorIsOpen}
+        devices={videosInputs}
+        onClose={() => setVideoInputSelectorIsOpen(false)}
+        onSelect={setSelectedVideo}
       />
     </Container>
   );
