@@ -5,14 +5,15 @@ import { ButtonContainer } from '../Basic/styles';
 export const RecordingButtonContainer = styled(ButtonContainer)`
   padding: 0;
   background-color: transparent;
-  height: 60px;
 
   &.recording-box {
     display: flex;
     flex-direction: column;
+    align-items: center;
   }
 
   & span {
+    width: initial;
     display: block;
     color: ${Theme.pallet.primaryDark};
     font-weight: bold;

@@ -9,23 +9,39 @@ type Props = {
   asLink?: boolean;
   href?: string;
   filenameDownload?: string;
+  disabled?: boolean;
+  width?: string | number;
+  maxWidth?: string | number;
 };
 
-export default function Button({ label, LeftIcon, RightIcon, onClick, asLink, href, filenameDownload }: Props) {
+export default function Button({
+  label,
+  LeftIcon,
+  RightIcon,
+  onClick,
+  asLink = false,
+  href,
+  filenameDownload,
+  disabled,
+  maxWidth,
+  width,
+}: Props) {
+  const style = useMemo(() => ({ maxWidth, width }), [maxWidth, width]);
+
   const content = useMemo(() => {
     const onClickFn = asLink ? () => {} : onClick;
     return (
-      <ButtonContainer onClick={onClickFn}>
+      <ButtonContainer onClick={onClickFn} disabled={disabled} asLink={asLink} style={style} hasLeftIcon={!!LeftIcon}>
         {LeftIcon && <div>{LeftIcon}</div>}
         <span>{label}</span>
         {RightIcon && <div>{RightIcon}</div>}
       </ButtonContainer>
     );
-  }, [LeftIcon, RightIcon, asLink, label, onClick]);
+  }, [LeftIcon, RightIcon, asLink, disabled, label, onClick, style]);
 
   if (asLink) {
     return (
-      <AsLink href={href} download={filenameDownload}>
+      <AsLink href={href} download={filenameDownload} style={style}>
         {content}
       </AsLink>
     );

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { screenDevice } from 'utils/devices';
 
 export function useDevicesSelector(kindToSelect: MediaDeviceKind) {
   const [isLoading, setIsLoading] = useState(true);
@@ -33,14 +34,6 @@ export function useAudioInputs() {
   const { devices, ...rest } = useDevicesSelector('audioinput');
   return { audioInputs: devices, ...rest };
 }
-
-export const screenDevice: MediaDeviceInfo = {
-  kind: 'videoinput',
-  deviceId: 'screen',
-  label: 'Tela',
-  groupId: '',
-  toJSON: () => JSON.stringify(screenDevice),
-};
 
 export function useVideosInputs() {
   const { devices, ...rest } = useDevicesSelector('videoinput');

@@ -36,6 +36,10 @@ export const Footer = styled.div`
 export const FooterLeftSide = styled.div`
   display: flex;
   flex-direction: row;
+
+  & > *:not(:last-child) {
+    margin-right: 10px;
+  }
 `;
 
 export const FooterRightSide = styled.div``;

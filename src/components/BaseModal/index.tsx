@@ -2,7 +2,7 @@ import React, { CSSProperties, ReactNode } from 'react';
 import Modal from 'react-modal';
 
 type Props = Modal.Props & {
-  children: ReactNode;
+  children: ReactNode;  
   style?: CSSProperties;
   overlayStyle?: CSSProperties;
   width?: string | number;

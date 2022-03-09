@@ -1,14 +1,13 @@
 import ButtonBasic from 'components/Buttons/Basic';
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { screenDevice, useAudioInputs, useVideosInputs } from './hooks/media-devices';
-import { useRequestWebcamAndMicrophonePermissions } from './hooks/permissions';
+import React, { useEffect, useRef, useState } from 'react';
+import { useAudioInputs, useVideosInputs } from './hooks/media-devices';
 import { Container, Footer, FooterLeftSide, FooterRightSide, RecordingVideo, VideoArea } from './styles';
 import { BsCameraVideo, BsChevronDown, BsDownload } from 'react-icons/bs';
 import { BiMicrophone } from 'react-icons/bi';
 import Theme from 'config/theme';
 import RecordingButton from 'components/Buttons/RecordingButton';
-import ModalSelector from 'components/ModalSelector';
 import MediaDeviceSelector from 'components/MediaDeviceSelector';
+import { screenDevice } from 'utils/devices';
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
 
@@ -18,17 +17,14 @@ function App() {
   const recordingChunks = useRef<Blob[]>([]);
 
   const [videoInputSelectorIsOpen, setVideoInputSelectorIsOpen] = useState(false);
+  const [audioInputSelectorIsOpen, setAudioInputSelectorIsOpen] = useState(false);
   const [selectedAudioInput, setSelectedAudioInput] = useState<MediaDeviceInfo | null>(null);
-  const [selectedVideoInputID, setSelectedVideoInputID] = useState<string>('screen');
   const [selectedVideo, setSelectedVideo] = useState<MediaDeviceInfo>(screenDevice);
-  const [isDisableAudio, setIsDisableAudio] = useState(false);
-  const [isToRecordScreenAudio, setIsToRecordScreenAudio] = useState(true);
   const [isRecordingRunning, setIsRecordingRunning] = useState(false);
   const [downloadLink, setDownloadLink] = useState<string | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
   const [downloadFileName, setDownloadFileName] = useState('file.webm');
 
-  // useRequestWebcamAndMicrophonePermissions();
   const { audioInputs } = useAudioInputs();
   const { videosInputs } = useVideosInputs();
 
@@ -47,7 +43,7 @@ function App() {
   }, [selectedVideo]);
 
   async function handleStartRecordingClick() {
-    if (!selectedVideoInputID) {
+    if (!selectedVideo) {
       alert('Is required select video input');
       return;
     }
@@ -84,6 +80,18 @@ function App() {
     mediaRecorder.current?.stop();
   }
 
+  function handleSelectVideoInput(videoInput: MediaDeviceInfo) {
+    setVideoInputSelectorIsOpen(false);
+    setSelectedVideo(videoInput);
+  }
+
+  function handleSelectAudioInput(audioInput: MediaDeviceInfo) {
+    setAudioInputSelectorIsOpen(false);
+    setSelectedAudioInput(audioInput);
+  }
+
+  console.log({ audioInputs });
+
   return (
     <Container>
       <VideoArea>
@@ -93,14 +101,20 @@ function App() {
         <FooterLeftSide>
           <ButtonBasic
             LeftIcon={<BiMicrophone size={20} color={Theme.pallet.primaryDark} />}
+            disabled={audioInputs.length === 0}
             label={selectedAudioInput?.label ?? 'Não selecionado'}
+            onClick={() => setAudioInputSelectorIsOpen(true)}
             RightIcon={<DownArrayIcon />}
+            width={200}
+            maxWidth={250}
           />
           <ButtonBasic
             LeftIcon={<BsCameraVideo size={20} color={Theme.pallet.primaryDark} />}
             label={selectedVideo?.label ?? ''}
             RightIcon={<DownArrayIcon />}
             onClick={() => setVideoInputSelectorIsOpen(true)}
+            width={200}
+            maxWidth={250}
           />
           {downloadLink && (
             <ButtonBasic
@@ -109,6 +123,8 @@ function App() {
               asLink
               href={downloadLink}
               filenameDownload={downloadFileName}
+              width={200}
+              maxWidth={250}
             />
           )}
         </FooterLeftSide>
@@ -124,7 +140,13 @@ function App() {
         isOpen={videoInputSelectorIsOpen}
         devices={videosInputs}
         onClose={() => setVideoInputSelectorIsOpen(false)}
-        onSelect={setSelectedVideo}
+        onSelect={handleSelectVideoInput}
+      />
+      <MediaDeviceSelector
+        isOpen={audioInputSelectorIsOpen}
+        devices={audioInputs}
+        onClose={() => setAudioInputSelectorIsOpen(false)}
+        onSelect={handleSelectAudioInput}
       />
     </Container>
   );
