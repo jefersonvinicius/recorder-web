@@ -11,6 +11,13 @@ import { screenDevice } from 'utils/devices';
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
 
+function getStream(videoInput: MediaDeviceInfo) {
+  if (videoInput.deviceId === 'screen') {
+    return navigator.mediaDevices.getDisplayMedia();
+  }
+  return navigator.mediaDevices.getUserMedia({ video: { deviceId: videoInput.deviceId } });
+}
+
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
@@ -29,17 +36,18 @@ function App() {
   const { videosInputs } = useVideosInputs();
 
   useEffect(() => {
-    mediaRecorder.current?.stop();
+    const _video = videoRef.current;
 
-    if (selectedVideo.deviceId === 'screen') {
-      navigator.mediaDevices.getDisplayMedia().then(setStream).catch(console.error);
-    } else {
-      navigator.mediaDevices.getUserMedia({ video: { deviceId: selectedVideo.deviceId } }).then(setStream);
-    }
+    getStream(selectedVideo).then(setStream);
 
     function setStream(stream: MediaStream) {
       videoRef.current!.srcObject = stream;
     }
+
+    return () => {
+      mediaRecorder.current?.stop();
+      (_video?.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
+    };
   }, [selectedVideo]);
 
   async function handleStartRecordingClick() {
@@ -48,8 +56,12 @@ function App() {
       return;
     }
 
-    const videoStream = videoRef.current?.srcObject as MediaStream;
-    console.log(videoStream.getTracks());
+    let videoStream = videoRef.current?.srcObject as MediaStream;
+    if (!videoStream.active) {
+      videoStream = await getStream(selectedVideo);
+      videoRef.current!.srcObject = videoStream;
+    }
+
     mediaRecorder.current = new MediaRecorder(videoStream);
     mediaRecorder.current.addEventListener('dataavailable', handleMediaRecorderDataAvailable);
     mediaRecorder.current.addEventListener('stop', handleMediaRecorderStop);
@@ -82,15 +94,13 @@ function App() {
 
   function handleSelectVideoInput(videoInput: MediaDeviceInfo) {
     setVideoInputSelectorIsOpen(false);
-    setSelectedVideo(videoInput);
+    setSelectedVideo({ ...videoInput });
   }
 
   function handleSelectAudioInput(audioInput: MediaDeviceInfo) {
     setAudioInputSelectorIsOpen(false);
     setSelectedAudioInput(audioInput);
   }
-
-  console.log({ audioInputs });
 
   return (
     <Container>
