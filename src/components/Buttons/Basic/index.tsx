@@ -1,7 +1,7 @@
-import React, { ReactNode, useMemo } from 'react';
+import React, { HTMLProps, ReactNode, useMemo } from 'react';
 import { AsLink, ButtonContainer } from './styles';
 
-type Props = {
+type Props = HTMLProps<HTMLButtonElement> & {
   label: string;
   onClick?: () => void;
   LeftIcon?: ReactNode;

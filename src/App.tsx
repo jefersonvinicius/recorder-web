@@ -8,6 +8,8 @@ import Theme from 'config/theme';
 import RecordingButton from 'components/Buttons/RecordingButton';
 import MediaDeviceSelector from 'components/MediaDeviceSelector';
 import { screenDevice } from 'utils/devices';
+import ReactTooltip from 'react-tooltip';
+import { useRequestWebcamAndMicrophonePermissions } from 'hooks/permissions';
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
 
@@ -35,7 +37,11 @@ function App() {
   const { audioInputs } = useAudioInputs();
   const { videosInputs } = useVideosInputs();
 
+  const requested = useRequestWebcamAndMicrophonePermissions();
+
   useEffect(() => {
+    if (!requested) return;
+
     const _video = videoRef.current;
 
     getStream(selectedVideo).then(setStream);
@@ -48,7 +54,7 @@ function App() {
       mediaRecorder.current?.stop();
       (_video?.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
     };
-  }, [selectedVideo]);
+  }, [selectedVideo, requested]);
 
   async function handleStartRecordingClick() {
     if (!selectedVideo) {
@@ -94,7 +100,7 @@ function App() {
 
   function handleSelectVideoInput(videoInput: MediaDeviceInfo) {
     setVideoInputSelectorIsOpen(false);
-    setSelectedVideo({ ...videoInput });
+    setSelectedVideo(videoInput);
   }
 
   function handleSelectAudioInput(audioInput: MediaDeviceInfo) {
@@ -104,12 +110,14 @@ function App() {
 
   return (
     <Container>
+      <ReactTooltip />
       <VideoArea>
         <RecordingVideo ref={videoRef} autoPlay />
       </VideoArea>
       <Footer>
         <FooterLeftSide>
           <ButtonBasic
+            data-tip="Selecionar"
             LeftIcon={<BiMicrophone size={20} color={Theme.pallet.primaryDark} />}
             disabled={audioInputs.length === 0}
             label={selectedAudioInput?.label ?? 'Não selecionado'}

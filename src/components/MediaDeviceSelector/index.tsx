@@ -14,7 +14,7 @@ type Props = {
 
 export default function MediaDeviceSelector({ devices, isOpen, onClose, onSelect }: Props) {
   const icon = useCallback((item: MediaDeviceInfo) => {
-    if (item === screenDevice) return <CgScreen />;
+    if (item.deviceId === screenDevice.deviceId) return <CgScreen />;
     if (item.kind === 'videoinput') return <CgWebcam />;
     return <TiMicrophone />;
   }, []);
