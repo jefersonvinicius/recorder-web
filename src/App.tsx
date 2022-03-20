@@ -10,14 +10,20 @@ import MediaDeviceSelector from 'components/MediaDeviceSelector';
 import { screenDevice } from 'utils/devices';
 import ReactTooltip from 'react-tooltip';
 import { useRequestWebcamAndMicrophonePermissions } from 'hooks/permissions';
+import { useStream } from 'hooks/stream';
+import { useCallback } from 'react';
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
 
-function getStream(videoInput: MediaDeviceInfo) {
+function getVideoStream(videoInput: MediaDeviceInfo) {
   if (videoInput.deviceId === 'screen') {
     return navigator.mediaDevices.getDisplayMedia();
   }
   return navigator.mediaDevices.getUserMedia({ video: { deviceId: videoInput.deviceId } });
+}
+
+function getAudioStream(audioInput: MediaDeviceInfo) {
+  return navigator.mediaDevices.getUserMedia({ audio: { deviceId: audioInput.deviceId } });
 }
 
 function App() {
@@ -39,22 +45,31 @@ function App() {
 
   const requested = useRequestWebcamAndMicrophonePermissions();
 
+  const onStreamChange = useCallback((stream: MediaStream | null) => {
+    console.log('Stream Changes!');
+    const onlyVideo = new MediaStream(stream?.getVideoTracks() ?? []);
+    videoRef.current!.srcObject = onlyVideo;
+  }, []);
+
+  const { replaceVideoTracks, replaceAudioTracks } = useStream({ onStreamChange });
+
   useEffect(() => {
-    if (!requested) return;
+    if (!requested || !selectedVideo) return;
 
     const _video = videoRef.current;
-
-    getStream(selectedVideo).then(setStream);
-
-    function setStream(stream: MediaStream) {
-      videoRef.current!.srcObject = stream;
-    }
+    getVideoStream(selectedVideo).then(replaceVideoTracks);
 
     return () => {
       mediaRecorder.current?.stop();
-      (_video?.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
+      (_video?.srcObject as MediaStream)?.getTracks().forEach((t) => t.stop());
     };
-  }, [selectedVideo, requested]);
+  }, [selectedVideo, requested, replaceVideoTracks]);
+
+  useEffect(() => {
+    if (!selectedAudioInput) return;
+
+    getAudioStream(selectedAudioInput).then(replaceAudioTracks);
+  }, [replaceAudioTracks, selectedAudioInput]);
 
   async function handleStartRecordingClick() {
     if (!selectedVideo) {
@@ -64,7 +79,7 @@ function App() {
 
     let videoStream = videoRef.current?.srcObject as MediaStream;
     if (!videoStream.active) {
-      videoStream = await getStream(selectedVideo);
+      videoStream = await getVideoStream(selectedVideo);
       videoRef.current!.srcObject = videoStream;
     }
 
@@ -83,7 +98,6 @@ function App() {
     function handleMediaRecorderStop() {
       const blob = new Blob(recordingChunks.current);
       const url = URL.createObjectURL(blob);
-      console.log({ url });
       setDownloadLink(url);
       setIsRecordingRunning(false);
       setDownloadFileName(`${new Date().toISOString()}.webm`);
@@ -99,8 +113,9 @@ function App() {
   }
 
   function handleSelectVideoInput(videoInput: MediaDeviceInfo) {
+    console.log({ videoInput });
     setVideoInputSelectorIsOpen(false);
-    setSelectedVideo(videoInput);
+    setSelectedVideo({ ...videoInput });
   }
 
   function handleSelectAudioInput(audioInput: MediaDeviceInfo) {
