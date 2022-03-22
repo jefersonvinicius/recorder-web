@@ -14,6 +14,16 @@ export const VideoArea = styled.div`
   padding: 10px;
 `;
 
+export const VideoPlaceholder = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const VideoPlaceholderText = styled.span``;
+
 export const InputBox = styled.div``;
 
 export const RecordingVideo = styled.video`

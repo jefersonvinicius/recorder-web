@@ -1,30 +1,27 @@
 import ButtonBasic from 'components/Buttons/Basic';
 import React, { useEffect, useRef, useState } from 'react';
 import { useAudioInputs, useVideosInputs } from './hooks/media-devices';
-import { Container, Footer, FooterLeftSide, FooterRightSide, RecordingVideo, VideoArea } from './styles';
+import {
+  Container,
+  Footer,
+  FooterLeftSide,
+  FooterRightSide,
+  RecordingVideo,
+  VideoArea,
+  VideoPlaceholder,
+  VideoPlaceholderText,
+} from './styles';
 import { BsCameraVideo, BsChevronDown, BsDownload } from 'react-icons/bs';
 import { BiMicrophone } from 'react-icons/bi';
 import Theme from 'config/theme';
 import RecordingButton from 'components/Buttons/RecordingButton';
 import MediaDeviceSelector from 'components/MediaDeviceSelector';
-import { screenDevice } from 'utils/devices';
 import ReactTooltip from 'react-tooltip';
-import { useRequestWebcamAndMicrophonePermissions } from 'hooks/permissions';
 import { useStream } from 'hooks/stream';
 import { useCallback } from 'react';
+import { getAudioStream, getVideoStream } from 'utils/streams';
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
-
-function getVideoStream(videoInput: MediaDeviceInfo) {
-  if (videoInput.deviceId === 'screen') {
-    return navigator.mediaDevices.getDisplayMedia();
-  }
-  return navigator.mediaDevices.getUserMedia({ video: { deviceId: videoInput.deviceId } });
-}
-
-function getAudioStream(audioInput: MediaDeviceInfo) {
-  return navigator.mediaDevices.getUserMedia({ audio: { deviceId: audioInput.deviceId } });
-}
 
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -34,42 +31,39 @@ function App() {
   const [videoInputSelectorIsOpen, setVideoInputSelectorIsOpen] = useState(false);
   const [audioInputSelectorIsOpen, setAudioInputSelectorIsOpen] = useState(false);
   const [selectedAudioInput, setSelectedAudioInput] = useState<MediaDeviceInfo | null>(null);
-  const [selectedVideo, setSelectedVideo] = useState<MediaDeviceInfo>(screenDevice);
+  const [selectedVideo, setSelectedVideo] = useState<MediaDeviceInfo | null>(null);
   const [isRecordingRunning, setIsRecordingRunning] = useState(false);
   const [downloadLink, setDownloadLink] = useState<string | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
   const [downloadFileName, setDownloadFileName] = useState('file.webm');
+  const [isDisplayResult, setIsDisplayResult] = useState(false);
 
   const { audioInputs } = useAudioInputs();
   const { videosInputs } = useVideosInputs();
 
-  const requested = useRequestWebcamAndMicrophonePermissions();
-
-  const onStreamChange = useCallback((stream: MediaStream | null) => {
-    console.log('Stream Changes!');
-    const onlyVideo = new MediaStream(stream?.getVideoTracks() ?? []);
-    videoRef.current!.srcObject = onlyVideo;
+  const setupVideoPreview = useCallback((streamToSetup: MediaStream | null) => {
+    const onlyVideo = new MediaStream(streamToSetup?.getVideoTracks() ?? []);
+    if (videoRef.current) videoRef.current.srcObject = onlyVideo;
   }, []);
 
-  const { replaceVideoTracks, replaceAudioTracks } = useStream({ onStreamChange });
+  const onStreamChange = useCallback(
+    (stream: MediaStream | null) => {
+      console.log('Stream Changes!');
+      setupVideoPreview(stream);
+      setIsDisplayResult(false);
+    },
+    [setupVideoPreview]
+  );
+
+  const { stream, replaceVideoTracks, replaceAudioTracks } = useStream({ onStreamChange });
 
   useEffect(() => {
-    if (!requested || !selectedVideo) return;
-
     const _video = videoRef.current;
-    getVideoStream(selectedVideo).then(replaceVideoTracks);
-
     return () => {
       mediaRecorder.current?.stop();
       (_video?.srcObject as MediaStream)?.getTracks().forEach((t) => t.stop());
     };
-  }, [selectedVideo, requested, replaceVideoTracks]);
-
-  useEffect(() => {
-    if (!selectedAudioInput) return;
-
-    getAudioStream(selectedAudioInput).then(replaceAudioTracks);
-  }, [replaceAudioTracks, selectedAudioInput]);
+  }, []);
 
   async function handleStartRecordingClick() {
     if (!selectedVideo) {
@@ -77,13 +71,17 @@ function App() {
       return;
     }
 
-    let videoStream = videoRef.current?.srcObject as MediaStream;
-    if (!videoStream.active) {
-      videoStream = await getVideoStream(selectedVideo);
-      videoRef.current!.srcObject = videoStream;
-    }
+    setIsDisplayResult(false);
 
-    mediaRecorder.current = new MediaRecorder(videoStream);
+    const previewVideoStream = videoRef.current!.srcObject as MediaStream;
+
+    const audioStream = selectedAudioInput ? await getAudioStream(selectedAudioInput) : null;
+    const videoStream = previewVideoStream.active ? previewVideoStream : await getVideoStream(selectedVideo);
+
+    if (audioStream) replaceAudioTracks(audioStream);
+    replaceVideoTracks(videoStream);
+
+    mediaRecorder.current = new MediaRecorder(stream.current!);
     mediaRecorder.current.addEventListener('dataavailable', handleMediaRecorderDataAvailable);
     mediaRecorder.current.addEventListener('stop', handleMediaRecorderStop);
     mediaRecorder.current.start(1000);
@@ -105,6 +103,7 @@ function App() {
       setRecordingTime(0);
       recordingChunks.current = [];
       mediaRecorder.current = null;
+      setIsDisplayResult(true);
     }
   }
 
@@ -113,21 +112,30 @@ function App() {
   }
 
   function handleSelectVideoInput(videoInput: MediaDeviceInfo) {
-    console.log({ videoInput });
     setVideoInputSelectorIsOpen(false);
-    setSelectedVideo({ ...videoInput });
+    setSelectedVideo(videoInput);
+
+    getVideoStream(videoInput).then(replaceVideoTracks);
   }
 
   function handleSelectAudioInput(audioInput: MediaDeviceInfo) {
     setAudioInputSelectorIsOpen(false);
     setSelectedAudioInput(audioInput);
+
+    getAudioStream(audioInput).then(replaceAudioTracks);
   }
 
   return (
     <Container>
       <ReactTooltip />
       <VideoArea>
-        <RecordingVideo ref={videoRef} autoPlay />
+        {selectedVideo ? (
+          <RecordingVideo ref={videoRef} autoPlay />
+        ) : (
+          <VideoPlaceholder>
+            <VideoPlaceholderText>Selecione um vídeo</VideoPlaceholderText>
+          </VideoPlaceholder>
+        )}
       </VideoArea>
       <Footer>
         <FooterLeftSide>
@@ -143,7 +151,7 @@ function App() {
           />
           <ButtonBasic
             LeftIcon={<BsCameraVideo size={20} color={Theme.pallet.primaryDark} />}
-            label={selectedVideo?.label ?? ''}
+            label={selectedVideo?.label ?? 'Não selecionado'}
             RightIcon={<DownArrayIcon />}
             onClick={() => setVideoInputSelectorIsOpen(true)}
             width={200}
