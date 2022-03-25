@@ -20,6 +20,8 @@ import ReactTooltip from 'react-tooltip';
 import { useStream } from 'hooks/stream';
 import { useCallback } from 'react';
 import { getAudioStream, getVideoStream } from 'utils/streams';
+import { useRequestWebcamAndMicrophonePermissions } from 'hooks/permissions';
+import AudioControl from 'components/AudioControl';
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
 
@@ -37,11 +39,18 @@ function App() {
   const [recordingTime, setRecordingTime] = useState(0);
   const [downloadFileName, setDownloadFileName] = useState('file.webm');
   const [isDisplayResult, setIsDisplayResult] = useState(false);
+  const [isAudioPaused, setIsAudioPaused] = useState(false);
+  const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
 
   const { audioInputs } = useAudioInputs();
   const { videosInputs } = useVideosInputs();
 
+  useRequestWebcamAndMicrophonePermissions();
+
   const setupVideoPreview = useCallback((streamToSetup: MediaStream | null) => {
+    if (streamToSetup) setAudioStream(new MediaStream(streamToSetup.getAudioTracks()));
+    else setAudioStream(null);
+
     const onlyVideo = new MediaStream(streamToSetup?.getVideoTracks() ?? []);
     if (videoRef.current) videoRef.current.srcObject = onlyVideo;
   }, []);
@@ -55,7 +64,9 @@ function App() {
     [setupVideoPreview]
   );
 
-  const { stream, replaceVideoTracks, replaceAudioTracks } = useStream({ onStreamChange });
+  const { stream, replaceVideoTracks, replaceAudioTracks, muteAudioTracks, unmuteAudioTracks } = useStream({
+    onStreamChange,
+  });
 
   useEffect(() => {
     const _video = videoRef.current;
@@ -125,12 +136,19 @@ function App() {
     getAudioStream(audioInput).then(replaceAudioTracks);
   }
 
+  function handlePauseAudioClick() {
+    if (isAudioPaused) unmuteAudioTracks();
+    else muteAudioTracks();
+
+    setIsAudioPaused(!isAudioPaused);
+  }
+
   return (
     <Container>
       <ReactTooltip />
       <VideoArea>
-        {selectedVideo ? (
-          <RecordingVideo ref={videoRef} autoPlay />
+        {selectedVideo || (isDisplayResult && downloadLink) ? (
+          <RecordingVideo src={downloadLink ?? undefined} ref={videoRef} autoPlay controls={isDisplayResult} />
         ) : (
           <VideoPlaceholder>
             <VideoPlaceholderText>Selecione um vídeo</VideoPlaceholderText>
@@ -170,10 +188,14 @@ function App() {
           )}
         </FooterLeftSide>
         <FooterRightSide>
+          {selectedAudioInput && audioStream && (
+            <AudioControl stream={audioStream} isPaused={isAudioPaused} onClick={handlePauseAudioClick} />
+          )}
           <RecordingButton
             onClick={isRecordingRunning ? handleStopRecording : handleStartRecordingClick}
             isRecording={isRecordingRunning}
             currentSeconds={recordingTime}
+            data-tip={isRecordingRunning ? 'Parar' : 'Iniciar'}
           />
         </FooterRightSide>
       </Footer>

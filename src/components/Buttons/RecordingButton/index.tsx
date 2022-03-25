@@ -4,13 +4,12 @@ import { Circle, RecordingButtonContainer } from './styles';
 import Lottie from 'react-lottie';
 import * as pulseAnimation from 'lottie/pulse-animation.json';
 
-type Props = {
+type Props = React.HTMLAttributes<HTMLButtonElement> & {
   isRecording: boolean;
   currentSeconds: number;
-  onClick: () => void;
 };
 
-export default function RecordingButton({ isRecording, currentSeconds, onClick }: Props) {
+export default function RecordingButton({ isRecording, currentSeconds, ...props }: Props) {
   const time = useMemo(() => {
     const minutes = Math.floor(currentSeconds / 60);
     const seconds = currentSeconds % 60;
@@ -18,7 +17,7 @@ export default function RecordingButton({ isRecording, currentSeconds, onClick }
   }, [currentSeconds]);
 
   return (
-    <RecordingButtonContainer onClick={onClick}>
+    <RecordingButtonContainer {...props}>
       {isRecording ? (
         <div className="recording-box">
           <span>GRAVANDO</span>

@@ -52,4 +52,12 @@ export const FooterLeftSide = styled.div`
   }
 `;
 
-export const FooterRightSide = styled.div``;
+export const FooterRightSide = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  & > *:not(:last-child) {
+    margin-right: 10px;
+  }
+`;

@@ -47,10 +47,28 @@ export function useStream({ onStreamChange }: Props) {
     [onStreamChange]
   );
 
+  const _changeEnabledStatusOfAudios = useCallback(({ enabled }: { enabled: boolean }) => {
+    stream.current?.getAudioTracks().forEach((track) => {
+      track.enabled = enabled;
+    });
+  }, []);
+
+  const muteAudioTracks = useCallback(() => {
+    _changeEnabledStatusOfAudios({ enabled: false });
+    onStreamChange?.(stream.current);
+  }, [_changeEnabledStatusOfAudios, onStreamChange]);
+
+  const unmuteAudioTracks = useCallback(() => {
+    _changeEnabledStatusOfAudios({ enabled: true });
+    onStreamChange?.(stream.current);
+  }, [_changeEnabledStatusOfAudios, onStreamChange]);
+
   return {
     stream,
     setStream,
     replaceAudioTracks,
     replaceVideoTracks,
+    muteAudioTracks,
+    unmuteAudioTracks,
   };
 }
