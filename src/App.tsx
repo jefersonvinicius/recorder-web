@@ -45,9 +45,9 @@ function App() {
   const { audioInputs } = useAudioInputs();
   const { videosInputs } = useVideosInputs();
 
-  useRequestWebcamAndMicrophonePermissions();
+  // useRequestWebcamAndMicrophonePermissions();
 
-  const setupVideoPreview = useCallback((streamToSetup: MediaStream | null) => {
+  const setupStreamPreview = useCallback((streamToSetup: MediaStream | null) => {
     if (streamToSetup) setAudioStream(new MediaStream(streamToSetup.getAudioTracks()));
     else setAudioStream(null);
 
@@ -58,10 +58,10 @@ function App() {
   const onStreamChange = useCallback(
     (stream: MediaStream | null) => {
       console.log('Stream Changes!');
-      setupVideoPreview(stream);
-      setIsDisplayResult(false);
+      console.log(stream?.getTracks());
+      setupStreamPreview(stream);
     },
-    [setupVideoPreview]
+    [setupStreamPreview]
   );
 
   const { stream, replaceVideoTracks, replaceAudioTracks, muteAudioTracks, unmuteAudioTracks } = useStream({
@@ -114,6 +114,7 @@ function App() {
       setRecordingTime(0);
       recordingChunks.current = [];
       mediaRecorder.current = null;
+      if (videoRef.current) videoRef.current.srcObject = null;
       setIsDisplayResult(true);
     }
   }
@@ -143,12 +144,26 @@ function App() {
     setIsAudioPaused(!isAudioPaused);
   }
 
+  function handleConfigureNextRecording() {
+    setIsDisplayResult(false);
+    setDownloadFileName('');
+    setDownloadLink('');
+
+    if (selectedVideo) getVideoStream(selectedVideo).then(replaceVideoTracks);
+    if (selectedAudioInput) getAudioStream(selectedAudioInput).then(replaceAudioTracks);
+  }
+
   return (
     <Container>
-      <ReactTooltip />
+      <ReactTooltip effect="solid" />
       <VideoArea>
         {selectedVideo || (isDisplayResult && downloadLink) ? (
-          <RecordingVideo src={downloadLink ?? undefined} ref={videoRef} autoPlay controls={isDisplayResult} />
+          <RecordingVideo
+            src={isDisplayResult && downloadLink ? downloadLink : undefined}
+            ref={videoRef}
+            autoPlay={!isDisplayResult}
+            controls={isDisplayResult}
+          />
         ) : (
           <VideoPlaceholder>
             <VideoPlaceholderText>Selecione um vídeo</VideoPlaceholderText>
@@ -157,46 +172,61 @@ function App() {
       </VideoArea>
       <Footer>
         <FooterLeftSide>
-          <ButtonBasic
-            data-tip="Selecionar"
-            LeftIcon={<BiMicrophone size={20} color={Theme.pallet.primaryDark} />}
-            disabled={audioInputs.length === 0}
-            label={selectedAudioInput?.label ?? 'Não selecionado'}
-            onClick={() => setAudioInputSelectorIsOpen(true)}
-            RightIcon={<DownArrayIcon />}
-            width={200}
-            maxWidth={250}
-          />
-          <ButtonBasic
-            LeftIcon={<BsCameraVideo size={20} color={Theme.pallet.primaryDark} />}
-            label={selectedVideo?.label ?? 'Não selecionado'}
-            RightIcon={<DownArrayIcon />}
-            onClick={() => setVideoInputSelectorIsOpen(true)}
-            width={200}
-            maxWidth={250}
-          />
-          {downloadLink && (
-            <ButtonBasic
-              LeftIcon={<BsDownload size={20} color={Theme.pallet.primaryDark} />}
-              label="Baixar Gravação"
-              asLink
-              href={downloadLink}
-              filenameDownload={downloadFileName}
-              width={200}
-              maxWidth={250}
-            />
+          {!isDisplayResult && (
+            <>
+              <ButtonBasic
+                data-tip="Selecionar"
+                LeftIcon={<BiMicrophone size={20} color={Theme.pallet.primaryDark} />}
+                disabled={audioInputs.length === 0}
+                label={selectedAudioInput?.label ?? 'Não selecionado'}
+                onClick={() => setAudioInputSelectorIsOpen(true)}
+                RightIcon={<DownArrayIcon />}
+                width={200}
+                maxWidth={250}
+              />
+              <ButtonBasic
+                LeftIcon={<BsCameraVideo size={20} color={Theme.pallet.primaryDark} />}
+                label={selectedVideo?.label ?? 'Não selecionado'}
+                RightIcon={<DownArrayIcon />}
+                onClick={() => setVideoInputSelectorIsOpen(true)}
+                width={200}
+                maxWidth={250}
+              />
+            </>
+          )}
+          {isDisplayResult && downloadLink && (
+            <>
+              <ButtonBasic
+                label="Configurar outra gravação"
+                onClick={handleConfigureNextRecording}
+                width={200}
+                maxWidth={250}
+                labelAlign="center"
+              />
+              <ButtonBasic
+                LeftIcon={<BsDownload size={20} color={Theme.pallet.primaryDark} />}
+                label="Baixar Gravação"
+                asLink
+                href={downloadLink}
+                filenameDownload={downloadFileName}
+                width={200}
+                maxWidth={250}
+              />
+            </>
           )}
         </FooterLeftSide>
         <FooterRightSide>
-          {selectedAudioInput && audioStream && (
+          {selectedAudioInput && audioStream && !isDisplayResult && (
             <AudioControl stream={audioStream} isPaused={isAudioPaused} onClick={handlePauseAudioClick} />
           )}
-          <RecordingButton
-            onClick={isRecordingRunning ? handleStopRecording : handleStartRecordingClick}
-            isRecording={isRecordingRunning}
-            currentSeconds={recordingTime}
-            data-tip={isRecordingRunning ? 'Parar' : 'Iniciar'}
-          />
+          {!isDisplayResult && (
+            <RecordingButton
+              onClick={isRecordingRunning ? handleStopRecording : handleStartRecordingClick}
+              isRecording={isRecordingRunning}
+              currentSeconds={recordingTime}
+              data-tip={isRecordingRunning ? 'Parar' : 'Iniciar'}
+            />
+          )}
         </FooterRightSide>
       </Footer>
       <MediaDeviceSelector

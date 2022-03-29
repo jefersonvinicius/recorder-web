@@ -1,6 +1,6 @@
 export function getVideoStream(videoInput: MediaDeviceInfo) {
   if (videoInput.deviceId === 'screen') {
-    return navigator.mediaDevices.getDisplayMedia();
+    return navigator.mediaDevices.getDisplayMedia({ video: true });
   }
   return navigator.mediaDevices.getUserMedia({ video: { deviceId: videoInput.deviceId } });
 }

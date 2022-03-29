@@ -12,6 +12,7 @@ type Props = HTMLProps<HTMLButtonElement> & {
   disabled?: boolean;
   width?: string | number;
   maxWidth?: string | number;
+  labelAlign?: 'right' | 'center' | 'left';
 };
 
 export default function Button({
@@ -25,6 +26,7 @@ export default function Button({
   disabled,
   maxWidth,
   width,
+  labelAlign = 'left',
 }: Props) {
   const style = useMemo(() => ({ maxWidth, width }), [maxWidth, width]);
 
@@ -33,11 +35,11 @@ export default function Button({
     return (
       <ButtonContainer onClick={onClickFn} disabled={disabled} asLink={asLink} style={style} hasLeftIcon={!!LeftIcon}>
         {LeftIcon && <div>{LeftIcon}</div>}
-        <span>{label}</span>
+        <span style={{ textAlign: labelAlign }}>{label}</span>
         {RightIcon && <div>{RightIcon}</div>}
       </ButtonContainer>
     );
-  }, [LeftIcon, RightIcon, asLink, disabled, label, onClick, style]);
+  }, [LeftIcon, RightIcon, asLink, disabled, label, labelAlign, onClick, style]);
 
   if (asLink) {
     return (

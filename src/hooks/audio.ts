@@ -6,7 +6,7 @@ export function useAudioFrequency(stream: MediaStream | null | undefined) {
   const [volumeAverage, setVolumeAverage] = useState(0);
 
   useEffect(() => {
-    if (!stream) return;
+    if (!stream || stream.getAudioTracks().length === 0) return;
 
     const audioContext = new AudioContext();
     const analyser = audioContext.createAnalyser();

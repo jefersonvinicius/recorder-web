@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import { interpolate } from 'utils/math';
 import { AudioControlContainer, AudioControlFrequency } from './styles';
 import { BiMicrophone, BiMicrophoneOff } from 'react-icons/bi';
+import Theme from 'config/theme';
 
 type Props = {
   stream: MediaStream;
@@ -10,14 +11,10 @@ type Props = {
   onClick: () => void;
 };
 
-export type AudioFrequencyRef = {
-  setStream: (stream: MediaStream) => void;
-};
-
 const MAX_SIZE = 40;
 const MIN_SIZE = 10;
 
-function AudioControl({ stream, isPaused, onClick }: Props) {
+export default function AudioControl({ stream, isPaused, onClick }: Props) {
   const frequency = useAudioFrequency(stream);
 
   const size = useMemo(() => {
@@ -33,7 +30,12 @@ function AudioControl({ stream, isPaused, onClick }: Props) {
 
   return (
     <AudioControlContainer
-      style={{ width: MAX_SIZE, height: MAX_SIZE, borderColor: iconProps.color }}
+      style={{
+        width: MAX_SIZE,
+        height: MAX_SIZE,
+        borderColor: iconProps.color,
+        backgroundColor: isPaused ? Theme.pallet.dangerLight : Theme.pallet.primaryDark,
+      }}
       onClick={onClick}
     >
       {!isPaused && <AudioControlFrequency style={{ width: size, height: size }} />}
@@ -41,5 +43,3 @@ function AudioControl({ stream, isPaused, onClick }: Props) {
     </AudioControlContainer>
   );
 }
-
-export default React.forwardRef<AudioFrequencyRef, Props>(AudioControl);

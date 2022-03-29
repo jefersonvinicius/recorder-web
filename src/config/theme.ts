@@ -3,6 +3,7 @@ export default class Theme {
     return {
       primaryLight: '#C1ECFF',
       primaryDark: '#0097DA',
+      dangerLight: '#e57373',
     };
   }
 }
