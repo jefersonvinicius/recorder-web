@@ -86,11 +86,14 @@ function App() {
 
     const previewVideoStream = videoRef.current!.srcObject as MediaStream;
 
-    const audioStream = selectedAudioInput ? await getAudioStream(selectedAudioInput) : null;
-    const videoStream = previewVideoStream.active ? previewVideoStream : await getVideoStream(selectedVideo);
-
-    if (audioStream) replaceAudioTracks(audioStream);
-    replaceVideoTracks(videoStream);
+    if (selectedAudioInput) {
+      const audioStream = await getAudioStream(selectedAudioInput);
+      replaceAudioTracks(audioStream);
+    }
+    if (!previewVideoStream.active) {
+      const videoStream = await getVideoStream(selectedVideo);
+      replaceVideoTracks(videoStream);
+    }
 
     mediaRecorder.current = new MediaRecorder(stream.current!);
     mediaRecorder.current.addEventListener('dataavailable', handleMediaRecorderDataAvailable);
@@ -110,7 +113,7 @@ function App() {
       setDownloadLink(url);
       setIsRecordingRunning(false);
       setDownloadFileName(`${new Date().toISOString()}.webm`);
-      videoStream.getTracks().forEach((track) => track.stop());
+      stream.current!.getTracks().forEach((track) => track.stop());
       setRecordingTime(0);
       recordingChunks.current = [];
       mediaRecorder.current = null;

@@ -21,6 +21,7 @@ export function useStream({ onStreamChange }: Props) {
 
       console.log('Replacing Audio Tracks');
       stream.current?.getAudioTracks().forEach((s) => {
+        s.stop();
         stream.current?.removeTrack(s);
       });
       audioStream.getAudioTracks().forEach((s) => {
@@ -37,6 +38,7 @@ export function useStream({ onStreamChange }: Props) {
 
       console.log('Replacing Video Tracks');
       stream.current?.getVideoTracks().forEach((s) => {
+        s.stop();
         stream.current?.removeTrack(s);
       });
       videoStream.getVideoTracks().forEach((s) => {
