@@ -1,31 +1,38 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { screenDevice } from 'utils/devices';
 
 export function useDevicesSelector(kindToSelect: MediaDeviceKind) {
   const [isLoading, setIsLoading] = useState(true);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
 
+  const filterDevices = useCallback(
+    (devices: MediaDeviceInfo[]) => {
+      return devices.filter((d) => d.kind === kindToSelect && !!d.label);
+    },
+    [kindToSelect]
+  );
+
   useEffect(() => {
     navigator.mediaDevices
       .enumerateDevices()
       .then((devices) => {
-        setDevices(devices.filter((d) => d.kind === kindToSelect));
+        setDevices(filterDevices(devices));
       })
       .finally(() => {
         setIsLoading(false);
       });
-  }, [kindToSelect]);
+  }, [filterDevices]);
 
   useEffect(() => {
     function handleDeviceChange() {
       navigator.mediaDevices.enumerateDevices().then((devices) => {
-        setDevices(devices.filter((d) => d.kind === kindToSelect));
+        setDevices(filterDevices(devices));
       });
     }
 
     navigator.mediaDevices.addEventListener('devicechange', handleDeviceChange);
     return () => navigator.mediaDevices.removeEventListener('devicechange', handleDeviceChange);
-  }, [kindToSelect]);
+  }, [filterDevices]);
 
   return { isLoading, devices };
 }

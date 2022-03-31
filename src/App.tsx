@@ -10,9 +10,11 @@ import {
   VideoArea,
   VideoPlaceholder,
   VideoPlaceholderText,
+  WarnMessage,
 } from './styles';
 import { BsCameraVideo, BsChevronDown, BsDownload } from 'react-icons/bs';
 import { BiMicrophone } from 'react-icons/bi';
+import { VscClose } from 'react-icons/vsc';
 import Theme from 'config/theme';
 import RecordingButton from 'components/Buttons/RecordingButton';
 import MediaDeviceSelector from 'components/MediaDeviceSelector';
@@ -20,7 +22,7 @@ import ReactTooltip from 'react-tooltip';
 import { useStream } from 'hooks/stream';
 import { useCallback } from 'react';
 import { getAudioStream, getVideoStream } from 'utils/streams';
-import { useRequestWebcamAndMicrophonePermissions } from 'hooks/permissions';
+import { useRequestWebcamAndMicrophonePermissions, WebcamAndMicrophoneStatuses } from 'hooks/permissions';
 import AudioControl from 'components/AudioControl';
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
@@ -41,11 +43,12 @@ function App() {
   const [isDisplayResult, setIsDisplayResult] = useState(false);
   const [isAudioPaused, setIsAudioPaused] = useState(false);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
+  const [isDisplayWarn, setIsDisplayWarn] = useState(true);
 
   const { audioInputs } = useAudioInputs();
   const { videosInputs } = useVideosInputs();
 
-  // useRequestWebcamAndMicrophonePermissions();
+  const status = useRequestWebcamAndMicrophonePermissions();
 
   const setupStreamPreview = useCallback((streamToSetup: MediaStream | null) => {
     if (streamToSetup) setAudioStream(new MediaStream(streamToSetup.getAudioTracks()));
@@ -173,12 +176,19 @@ function App() {
           </VideoPlaceholder>
         )}
       </VideoArea>
+      {status === WebcamAndMicrophoneStatuses.Denied && isDisplayWarn && (
+        <WarnMessage>
+          <span>Sem permissão alguns dispositivos não aparecerão para serem selecionado</span>
+          <button onClick={() => setIsDisplayWarn(false)}>
+            <VscClose size={17} color="#555" />
+          </button>
+        </WarnMessage>
+      )}
       <Footer>
         <FooterLeftSide>
           {!isDisplayResult && (
             <>
               <ButtonBasic
-                data-tip="Selecionar"
                 LeftIcon={<BiMicrophone size={20} color={Theme.pallet.primaryDark} />}
                 disabled={audioInputs.length === 0}
                 label={selectedAudioInput?.label ?? 'Não selecionado'}

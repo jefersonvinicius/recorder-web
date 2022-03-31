@@ -36,6 +36,35 @@ export const RecordPreview = styled.video`
   ${videoBaseStyle}
 `;
 
+export const WarnMessage = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fdd835;
+  padding: 5px 50px;
+  margin: 10px 0;
+  color: #555;
+
+  & > span {
+    font-size: 14px;
+  }
+
+  & > button {
+    background-color: transparent;
+    border: none;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-left: 20px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+`;
+
 export const Footer = styled.div`
   display: flex;
   flex-direction: row;
