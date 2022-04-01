@@ -190,7 +190,7 @@ function App() {
             <>
               <ButtonBasic
                 LeftIcon={<BiMicrophone size={20} color={Theme.pallet.primaryDark} />}
-                disabled={audioInputs.length === 0}
+                disabled={audioInputs.length === 0 || isRecordingRunning}
                 label={selectedAudioInput?.label ?? 'Não selecionado'}
                 onClick={() => setAudioInputSelectorIsOpen(true)}
                 RightIcon={<DownArrayIcon />}
@@ -199,6 +199,7 @@ function App() {
               />
               <ButtonBasic
                 LeftIcon={<BsCameraVideo size={20} color={Theme.pallet.primaryDark} />}
+                disabled={isRecordingRunning}
                 label={selectedVideo?.label ?? 'Não selecionado'}
                 RightIcon={<DownArrayIcon />}
                 onClick={() => setVideoInputSelectorIsOpen(true)}
