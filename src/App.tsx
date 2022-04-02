@@ -15,6 +15,7 @@ import {
 import { BsCameraVideo, BsChevronDown, BsDownload } from 'react-icons/bs';
 import { BiMicrophone } from 'react-icons/bi';
 import { VscClose } from 'react-icons/vsc';
+import { MdShare } from 'react-icons/md';
 import Theme from 'config/theme';
 import RecordingButton from 'components/Buttons/RecordingButton';
 import MediaDeviceSelector from 'components/MediaDeviceSelector';
@@ -24,6 +25,7 @@ import { useCallback } from 'react';
 import { getAudioStream, getVideoStream } from 'utils/streams';
 import { useRequestWebcamAndMicrophonePermissions, WebcamAndMicrophoneStatuses } from 'hooks/permissions';
 import AudioControl from 'components/AudioControl';
+import IconButton from 'components/Buttons/IconButton';
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
 
@@ -31,6 +33,7 @@ function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const recordingChunks = useRef<Blob[]>([]);
+  const recordingBlob = useRef<Blob | null>(null);
 
   const [videoInputSelectorIsOpen, setVideoInputSelectorIsOpen] = useState(false);
   const [audioInputSelectorIsOpen, setAudioInputSelectorIsOpen] = useState(false);
@@ -112,6 +115,7 @@ function App() {
 
     function handleMediaRecorderStop() {
       const blob = new Blob(recordingChunks.current);
+      recordingBlob.current = blob;
       const url = URL.createObjectURL(blob);
       setDownloadLink(url);
       setIsRecordingRunning(false);
@@ -134,6 +138,20 @@ function App() {
     setSelectedVideo(videoInput);
 
     getVideoStream(videoInput).then(replaceVideoTracks);
+  }
+
+  function handleShareClick() {
+    if (!recordingBlob.current) return;
+
+    const file = new File([recordingBlob.current], 'file.webm');
+    const data: ShareData = {
+      files: [file],
+      title: 'My Recording',
+    };
+
+    if (navigator.canShare(data)) {
+      navigator.share(data);
+    }
   }
 
   function handleSelectAudioInput(audioInput: MediaDeviceInfo) {
@@ -226,6 +244,9 @@ function App() {
                 width={200}
                 maxWidth={250}
               />
+              <IconButton size={50} onClick={handleShareClick}>
+                <MdShare color={Theme.pallet.primaryDark} size={20} />
+              </IconButton>
             </>
           )}
         </FooterLeftSide>

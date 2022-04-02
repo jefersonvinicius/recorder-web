@@ -70,11 +70,13 @@ export const Footer = styled.div`
   flex-direction: row;
   padding: 0px 10px 10px 10px;
   justify-content: space-between;
+  align-items: center;
 `;
 
 export const FooterLeftSide = styled.div`
   display: flex;
   flex-direction: row;
+  align-items: center;
 
   & > *:not(:last-child) {
     margin-right: 10px;
