@@ -1,5 +1,5 @@
 import ButtonBasic from 'components/Buttons/Basic';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useAudioInputs, useVideosInputs } from './hooks/media-devices';
 import {
   Container,
@@ -21,11 +21,12 @@ import RecordingButton from 'components/Buttons/RecordingButton';
 import MediaDeviceSelector from 'components/MediaDeviceSelector';
 import ReactTooltip from 'react-tooltip';
 import { useStream } from 'hooks/stream';
-import { useCallback } from 'react';
 import { getAudioStream, getVideoStream } from 'utils/streams';
 import { useRequestWebcamAndMicrophonePermissions, WebcamAndMicrophoneStatuses } from 'hooks/permissions';
 import AudioControl from 'components/AudioControl';
 import IconButton from 'components/Buttons/IconButton';
+
+console.log(process.env);
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
 
