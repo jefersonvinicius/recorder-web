@@ -15,7 +15,6 @@ import {
 import { BsCameraVideo, BsChevronDown, BsDownload } from 'react-icons/bs';
 import { BiMicrophone } from 'react-icons/bi';
 import { VscClose } from 'react-icons/vsc';
-import { MdShare } from 'react-icons/md';
 import Theme from 'config/theme';
 import RecordingButton from 'components/Buttons/RecordingButton';
 import MediaDeviceSelector from 'components/MediaDeviceSelector';
@@ -24,12 +23,11 @@ import { useStream } from 'hooks/stream';
 import { getAudioStream, getVideoStream } from 'utils/streams';
 import { useRequestWebcamAndMicrophonePermissions, WebcamAndMicrophoneStatuses } from 'hooks/permissions';
 import AudioControl from 'components/AudioControl';
-import IconButton from 'components/Buttons/IconButton';
 import { isMobile } from 'react-device-detect';
 import { ToastContainer } from 'react-toastify';
-import { shareVideoFile } from 'utils/sharing';
 
 import 'react-toastify/dist/ReactToastify.css';
+import MobileWarning from 'components/MobileWarning';
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
 
@@ -144,11 +142,6 @@ function App() {
     getVideoStream(videoInput).then(replaceVideoTracks);
   }
 
-  async function handleShareClick() {
-    if (!recordingBlob.current) return;
-    shareVideoFile(recordingBlob.current);
-  }
-
   function handleSelectAudioInput(audioInput: MediaDeviceInfo) {
     setAudioInputSelectorIsOpen(false);
     setSelectedAudioInput(audioInput);
@@ -170,6 +163,10 @@ function App() {
 
     if (selectedVideo) getVideoStream(selectedVideo).then(replaceVideoTracks);
     if (selectedAudioInput) getAudioStream(selectedAudioInput).then(replaceAudioTracks);
+  }
+
+  if (isMobile) {
+    return <MobileWarning />;
   }
 
   return (
@@ -239,11 +236,6 @@ function App() {
                 width={200}
                 maxWidth={250}
               />
-              {isMobile && (
-                <IconButton size={50} onClick={handleShareClick}>
-                  <MdShare color={Theme.pallet.primaryDark} size={20} />
-                </IconButton>
-              )}
             </>
           )}
         </FooterLeftSide>
