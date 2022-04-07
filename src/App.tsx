@@ -25,8 +25,11 @@ import { getAudioStream, getVideoStream } from 'utils/streams';
 import { useRequestWebcamAndMicrophonePermissions, WebcamAndMicrophoneStatuses } from 'hooks/permissions';
 import AudioControl from 'components/AudioControl';
 import IconButton from 'components/Buttons/IconButton';
+import { isMobile } from 'react-device-detect';
+import { ToastContainer } from 'react-toastify';
+import { shareVideoFile } from 'utils/sharing';
 
-console.log(process.env);
+import 'react-toastify/dist/ReactToastify.css';
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
 
@@ -141,18 +144,9 @@ function App() {
     getVideoStream(videoInput).then(replaceVideoTracks);
   }
 
-  function handleShareClick() {
+  async function handleShareClick() {
     if (!recordingBlob.current) return;
-
-    const file = new File([recordingBlob.current], 'file.webm');
-    const data: ShareData = {
-      files: [file],
-      title: 'My Recording',
-    };
-
-    if (navigator.canShare(data)) {
-      navigator.share(data);
-    }
+    shareVideoFile(recordingBlob.current);
   }
 
   function handleSelectAudioInput(audioInput: MediaDeviceInfo) {
@@ -245,9 +239,11 @@ function App() {
                 width={200}
                 maxWidth={250}
               />
-              <IconButton size={50} onClick={handleShareClick}>
-                <MdShare color={Theme.pallet.primaryDark} size={20} />
-              </IconButton>
+              {isMobile && (
+                <IconButton size={50} onClick={handleShareClick}>
+                  <MdShare color={Theme.pallet.primaryDark} size={20} />
+                </IconButton>
+              )}
             </>
           )}
         </FooterLeftSide>
@@ -277,6 +273,7 @@ function App() {
         onClose={() => setAudioInputSelectorIsOpen(false)}
         onSelect={handleSelectAudioInput}
       />
+      <ToastContainer position="top-right" />
     </Container>
   );
 }

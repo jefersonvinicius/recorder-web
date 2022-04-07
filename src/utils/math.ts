@@ -1,6 +1,6 @@
 type InterpolationConfig = {
-  input: number[];
-  output: number[];
+  input: [number, number];
+  output: [number, number];
 };
 
 export function interpolate(value: number, config: InterpolationConfig) {
