@@ -28,6 +28,7 @@ import { ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 import MobileWarning from 'components/MobileWarning';
+import ModalAbout, { useModalAbout } from 'components/ModalAbout';
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
 
@@ -49,6 +50,8 @@ function App() {
   const [isAudioPaused, setIsAudioPaused] = useState(false);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [isDisplayWarn, setIsDisplayWarn] = useState(true);
+
+  const { modalAboutIsOpen, closeModalAbout } = useModalAbout();
 
   const { audioInputs } = useAudioInputs();
   const { videosInputs } = useVideosInputs();
@@ -174,12 +177,14 @@ function App() {
       <ReactTooltip effect="solid" />
       <VideoArea>
         {selectedVideo || (isDisplayResult && downloadLink) ? (
-          <RecordingVideo
-            src={isDisplayResult && downloadLink ? downloadLink : undefined}
-            ref={videoRef}
-            autoPlay={!isDisplayResult}
-            controls={isDisplayResult}
-          />
+          <VideoPlaceholder>
+            <RecordingVideo
+              src={isDisplayResult && downloadLink ? downloadLink : undefined}
+              ref={videoRef}
+              autoPlay={!isDisplayResult}
+              controls={isDisplayResult}
+            />
+          </VideoPlaceholder>
         ) : (
           <VideoPlaceholder>
             <VideoPlaceholderText>Selecione um vídeo</VideoPlaceholderText>
@@ -265,6 +270,7 @@ function App() {
         onClose={() => setAudioInputSelectorIsOpen(false)}
         onSelect={handleSelectAudioInput}
       />
+      <ModalAbout isOpen={modalAboutIsOpen} onClose={closeModalAbout} />
       <ToastContainer position="top-right" />
     </Container>
   );

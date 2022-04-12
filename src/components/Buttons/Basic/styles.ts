@@ -1,12 +1,20 @@
 import Theme from 'config/theme';
 import styled from 'styled-components';
+import { ColorStyle } from '.';
 
 export const AsLink = styled.a`
   display: block;
   text-decoration: none;
 `;
-export const ButtonContainer = styled.button<{ asLink?: boolean; hasLeftIcon?: boolean }>`
-  background-color: ${Theme.pallet.primaryLight};
+
+type ButtonContainerProps = {
+  asLink?: boolean;
+  hasLeftIcon?: boolean;
+  colorStyle?: ColorStyle;
+};
+
+export const ButtonContainer = styled.button<ButtonContainerProps>`
+  background-color: ${(props) => (props.colorStyle === 'dark' ? Theme.pallet.primaryDark : Theme.pallet.primaryLight)};
   border: none;
   display: flex;
   flex-direction: row;
@@ -22,7 +30,7 @@ export const ButtonContainer = styled.button<{ asLink?: boolean; hasLeftIcon?: b
   }
 
   & > span {
-    color: ${Theme.pallet.primaryDark};
+    color: ${(props) => (props.colorStyle === 'dark' ? '#fff' : Theme.pallet.primaryDark)};
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;

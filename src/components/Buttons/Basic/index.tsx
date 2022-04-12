@@ -1,7 +1,9 @@
-import React, { HTMLProps, ReactNode, useMemo } from 'react';
+import React, { HTMLAttributes, ReactNode, useMemo } from 'react';
 import { AsLink, ButtonContainer } from './styles';
 
-type Props = HTMLProps<HTMLButtonElement> & {
+export type ColorStyle = 'light' | 'dark';
+
+type Props = HTMLAttributes<HTMLButtonElement> & {
   label: string;
   onClick?: () => void;
   LeftIcon?: ReactNode;
@@ -13,6 +15,8 @@ type Props = HTMLProps<HTMLButtonElement> & {
   width?: string | number;
   maxWidth?: string | number;
   labelAlign?: 'right' | 'center' | 'left';
+  colorStyle?: ColorStyle;
+  children?: ReactNode;
 };
 
 export default function Button({
@@ -27,19 +31,32 @@ export default function Button({
   maxWidth,
   width,
   labelAlign = 'left',
+  colorStyle = 'light',
+  ...props
 }: Props) {
-  const style = useMemo(() => ({ maxWidth, width }), [maxWidth, width]);
+  console.log(props.style);
+  const style = useMemo(() => ({ maxWidth, width, ...props.style }), [maxWidth, width, props.style]);
 
   const content = useMemo(() => {
     const onClickFn = asLink ? () => {} : onClick;
     return (
-      <ButtonContainer onClick={onClickFn} disabled={disabled} asLink={asLink} style={style} hasLeftIcon={!!LeftIcon}>
-        {LeftIcon && <div>{LeftIcon}</div>}
-        <span style={{ textAlign: labelAlign }}>{label}</span>
-        {RightIcon && <div>{RightIcon}</div>}
+      <ButtonContainer
+        onClick={onClickFn}
+        disabled={disabled}
+        colorStyle={colorStyle}
+        asLink={asLink}
+        hasLeftIcon={!!LeftIcon}
+        {...props}
+        style={style}
+      >
+        <>
+          {LeftIcon && <div>{LeftIcon}</div>}
+          <span style={{ textAlign: labelAlign }}>{label}</span>
+          {RightIcon && <div>{RightIcon}</div>}
+        </>
       </ButtonContainer>
     );
-  }, [LeftIcon, RightIcon, asLink, disabled, label, labelAlign, onClick, style]);
+  }, [LeftIcon, RightIcon, asLink, colorStyle, disabled, label, labelAlign, onClick, props, style]);
 
   if (asLink) {
     return (

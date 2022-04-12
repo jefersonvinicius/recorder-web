@@ -6,11 +6,13 @@ const videoBaseStyle = css`
 `;
 
 export const Container = styled.div`
+  display: flex;
+  flex-direction: column;
   height: 100%;
 `;
 
 export const VideoArea = styled.div`
-  height: 85%;
+  flex: 1;
   padding: 10px;
 `;
 
@@ -20,6 +22,8 @@ export const VideoPlaceholder = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #999;
+  border-radius: 5px;
 `;
 
 export const VideoPlaceholderText = styled.span``;
@@ -29,7 +33,10 @@ export const InputBox = styled.div``;
 export const RecordingVideo = styled.video`
   width: 100%;
   height: 100%;
+  object-fit: fill;
+  aspect-ratio: calc(16 / 9);
   border-radius: 5px;
+  background-color: #ccc;
 `;
 
 export const RecordPreview = styled.video`
