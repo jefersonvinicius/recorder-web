@@ -1,3 +1,5 @@
+import IconButton from 'components/Buttons/IconButton';
+import Theme from 'config/theme';
 import styled from 'styled-components';
 
 export const VIDEO_AREA_PADDING = 10;
@@ -86,4 +88,12 @@ export const FooterRightSide = styled.div`
   & > *:not(:last-child) {
     margin-right: 10px;
   }
+`;
+
+export const InfoButton = styled(IconButton)`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: ${Theme.pallet.primaryDark};
+  color: #fff;
 `;

@@ -6,6 +6,7 @@ import {
   Footer,
   FooterLeftSide,
   FooterRightSide,
+  InfoButton,
   RecordingVideo,
   VideoArea,
   VideoPlaceholder,
@@ -15,6 +16,7 @@ import {
 } from './styles';
 import { BsCameraVideo, BsChevronDown, BsDownload } from 'react-icons/bs';
 import { BiMicrophone } from 'react-icons/bi';
+import { IoMdHelp } from 'react-icons/io';
 import { VscClose } from 'react-icons/vsc';
 import Theme from 'config/theme';
 import RecordingButton from 'components/Buttons/RecordingButton';
@@ -56,7 +58,7 @@ function App() {
   const [videoWidth, setVideoWidth] = useState(0);
   const [videoHeight, setVideoHeight] = useState(0);
 
-  const { modalAboutIsOpen, closeModalAbout } = useModalAbout();
+  const { modalAboutIsOpen, closeModalAbout, openModalAbout } = useModalAbout();
 
   const { audioInputs } = useAudioInputs();
   const { videosInputs } = useVideosInputs();
@@ -222,6 +224,9 @@ function App() {
             <VideoPlaceholderText>Selecione um vídeo</VideoPlaceholderText>
           </VideoPlaceholder>
         )}
+        <InfoButton size={30} onClick={openModalAbout}>
+          <IoMdHelp />
+        </InfoButton>
       </VideoArea>
       {status === WebcamAndMicrophoneStatuses.Denied && isDisplayWarn && (
         <WarnMessage>
