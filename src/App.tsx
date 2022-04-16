@@ -10,6 +10,7 @@ import {
   VideoArea,
   VideoPlaceholder,
   VideoPlaceholderText,
+  VIDEO_AREA_PADDING,
   WarnMessage,
 } from './styles';
 import { BsCameraVideo, BsChevronDown, BsDownload } from 'react-icons/bs';
@@ -29,10 +30,12 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import MobileWarning from 'components/MobileWarning';
 import ModalAbout, { useModalAbout } from 'components/ModalAbout';
+import { useCalculateVideoHeightOnWindowResize } from 'hooks/layout';
 
 const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
 
 function App() {
+  const videoAreaRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const recordingChunks = useRef<Blob[]>([]);
@@ -50,6 +53,8 @@ function App() {
   const [isAudioPaused, setIsAudioPaused] = useState(false);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [isDisplayWarn, setIsDisplayWarn] = useState(true);
+  const [videoWidth, setVideoWidth] = useState(0);
+  const [videoHeight, setVideoHeight] = useState(0);
 
   const { modalAboutIsOpen, closeModalAbout } = useModalAbout();
 
@@ -57,6 +62,20 @@ function App() {
   const { videosInputs } = useVideosInputs();
 
   const status = useRequestWebcamAndMicrophonePermissions();
+
+  const calculateVideoHeight = useCallback(() => {
+    if (!videoAreaRef.current) return;
+    const height = videoAreaRef.current.getBoundingClientRect().height - VIDEO_AREA_PADDING * 2;
+    setVideoHeight(height);
+  }, []);
+
+  const calculateVideoWidth = useCallback((videoHeightParam: number, streamParam: MediaStream | null) => {
+    const settings = streamParam?.getVideoTracks()[0].getSettings();
+    if (settings && videoHeightParam) {
+      const width = videoHeightParam * (settings.aspectRatio || 16 / 9);
+      setVideoWidth(width);
+    }
+  }, []);
 
   const setupStreamPreview = useCallback((streamToSetup: MediaStream | null) => {
     if (streamToSetup) setAudioStream(new MediaStream(streamToSetup.getAudioTracks()));
@@ -68,11 +87,10 @@ function App() {
 
   const onStreamChange = useCallback(
     (stream: MediaStream | null) => {
-      console.log('Stream Changes!');
-      console.log(stream?.getTracks());
+      calculateVideoWidth(videoHeight, stream);
       setupStreamPreview(stream);
     },
-    [setupStreamPreview]
+    [calculateVideoWidth, setupStreamPreview, videoHeight]
   );
 
   const { stream, replaceVideoTracks, replaceAudioTracks, muteAudioTracks, unmuteAudioTracks } = useStream({
@@ -86,6 +104,14 @@ function App() {
       (_video?.srcObject as MediaStream)?.getTracks().forEach((t) => t.stop());
     };
   }, []);
+
+  useCalculateVideoHeightOnWindowResize({
+    calculateFn: calculateVideoHeight,
+  });
+
+  useEffect(() => {
+    calculateVideoWidth(videoHeight, stream.current);
+  }, [calculateVideoWidth, stream, videoHeight]);
 
   async function handleStartRecordingClick() {
     if (!selectedVideo) {
@@ -168,6 +194,11 @@ function App() {
     if (selectedAudioInput) getAudioStream(selectedAudioInput).then(replaceAudioTracks);
   }
 
+  function handleVideoAreaRef(ref: HTMLDivElement | null) {
+    videoAreaRef.current = ref;
+    if (videoHeight === 0) calculateVideoHeight();
+  }
+
   if (isMobile) {
     return <MobileWarning />;
   }
@@ -175,7 +206,7 @@ function App() {
   return (
     <Container>
       <ReactTooltip effect="solid" />
-      <VideoArea>
+      <VideoArea ref={handleVideoAreaRef}>
         {selectedVideo || (isDisplayResult && downloadLink) ? (
           <VideoPlaceholder>
             <RecordingVideo
@@ -183,6 +214,7 @@ function App() {
               ref={videoRef}
               autoPlay={!isDisplayResult}
               controls={isDisplayResult}
+              style={{ width: videoWidth, height: videoHeight }}
             />
           </VideoPlaceholder>
         ) : (

@@ -1,9 +1,6 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-const videoBaseStyle = css`
-  width: ${1280 / 2}px;
-  height: ${720 / 2}px;
-`;
+export const VIDEO_AREA_PADDING = 10;
 
 export const Container = styled.div`
   display: flex;
@@ -13,7 +10,7 @@ export const Container = styled.div`
 
 export const VideoArea = styled.div`
   flex: 1;
-  padding: 10px;
+  padding: ${VIDEO_AREA_PADDING}px;
 `;
 
 export const VideoPlaceholder = styled.div`
@@ -31,16 +28,7 @@ export const VideoPlaceholderText = styled.span``;
 export const InputBox = styled.div``;
 
 export const RecordingVideo = styled.video`
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  aspect-ratio: calc(16 / 9);
-  border-radius: 5px;
-  background-color: #ccc;
-`;
-
-export const RecordPreview = styled.video`
-  ${videoBaseStyle}
+  object-fit: contain;
 `;
 
 export const WarnMessage = styled.div`
