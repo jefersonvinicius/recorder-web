@@ -1,6 +1,7 @@
 import styled from 'styled-components';
+import Button from '../Basic';
 
-export const IconButtonContainer = styled.button`
+export const IconButtonContainer = styled(Button)`
   border: none;
   background-color: transparent;
   display: flex;

@@ -1,7 +1,8 @@
-import React, { HTMLAttributes } from 'react';
+import React from 'react';
+import { BasicButtonProps } from '../Basic';
 import { IconButtonContainer } from './styles';
 
-type Props = HTMLAttributes<HTMLButtonElement> & {
+type Props = BasicButtonProps & {
   size: number;
 };
 

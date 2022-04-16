@@ -3,8 +3,8 @@ import { AsLink, ButtonContainer } from './styles';
 
 export type ColorStyle = 'light' | 'dark';
 
-type Props = HTMLAttributes<HTMLButtonElement> & {
-  label: string;
+export type BasicButtonProps = HTMLAttributes<HTMLButtonElement> & {
+  label?: string;
   onClick?: () => void;
   LeftIcon?: ReactNode;
   RightIcon?: ReactNode;
@@ -33,7 +33,7 @@ export default function Button({
   labelAlign = 'left',
   colorStyle = 'light',
   ...props
-}: Props) {
+}: BasicButtonProps) {
   console.log(props.style);
   const style = useMemo(() => ({ maxWidth, width, ...props.style }), [maxWidth, width, props.style]);
 
@@ -49,11 +49,15 @@ export default function Button({
         {...props}
         style={style}
       >
-        <>
-          {LeftIcon && <div>{LeftIcon}</div>}
-          <span style={{ textAlign: labelAlign }}>{label}</span>
-          {RightIcon && <div>{RightIcon}</div>}
-        </>
+        {props.children ? (
+          props.children
+        ) : (
+          <>
+            {LeftIcon && <div>{LeftIcon}</div>}
+            <span style={{ textAlign: labelAlign }}>{label ?? ''}</span>
+            {RightIcon && <div>{RightIcon}</div>}
+          </>
+        )}
       </ButtonContainer>
     );
   }, [LeftIcon, RightIcon, asLink, colorStyle, disabled, label, labelAlign, onClick, props, style]);

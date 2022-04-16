@@ -16,7 +16,7 @@ import {
 } from './styles';
 import { BsCameraVideo, BsChevronDown, BsDownload } from 'react-icons/bs';
 import { BiMicrophone } from 'react-icons/bi';
-import { IoMdHelp } from 'react-icons/io';
+import { IoMdHelp, IoMdSettings } from 'react-icons/io';
 import { VscClose } from 'react-icons/vsc';
 import Theme from 'config/theme';
 import RecordingButton from 'components/Buttons/RecordingButton';
@@ -33,8 +33,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import MobileWarning from 'components/MobileWarning';
 import ModalAbout, { useModalAbout } from 'components/ModalAbout';
 import { useCalculateVideoHeightOnWindowResize } from 'hooks/layout';
+import IconButton from 'components/Buttons/IconButton';
 
-const DownArrayIcon = () => <BsChevronDown size={20} color={Theme.pallet.primaryDark} />;
+const defaultIconProps = { size: 20, color: Theme.pallet.primaryDark };
+const DownArrayIcon = () => <BsChevronDown {...defaultIconProps} />;
 
 function App() {
   const videoAreaRef = useRef<HTMLDivElement | null>(null);
@@ -225,7 +227,7 @@ function App() {
           </VideoPlaceholder>
         )}
         <InfoButton size={30} onClick={openModalAbout}>
-          <IoMdHelp />
+          <IoMdHelp size={20} />
         </InfoButton>
       </VideoArea>
       {status === WebcamAndMicrophoneStatuses.Denied && isDisplayWarn && (
@@ -241,7 +243,7 @@ function App() {
           {!isDisplayResult && (
             <>
               <ButtonBasic
-                LeftIcon={<BiMicrophone size={20} color={Theme.pallet.primaryDark} />}
+                LeftIcon={<BiMicrophone {...defaultIconProps} />}
                 disabled={audioInputs.length === 0 || isRecordingRunning}
                 label={selectedAudioInput?.label ?? 'Não selecionado'}
                 onClick={() => setAudioInputSelectorIsOpen(true)}
@@ -250,7 +252,7 @@ function App() {
                 maxWidth={250}
               />
               <ButtonBasic
-                LeftIcon={<BsCameraVideo size={20} color={Theme.pallet.primaryDark} />}
+                LeftIcon={<BsCameraVideo {...defaultIconProps} />}
                 disabled={isRecordingRunning}
                 label={selectedVideo?.label ?? 'Não selecionado'}
                 RightIcon={<DownArrayIcon />}
@@ -263,21 +265,16 @@ function App() {
           {isDisplayResult && downloadLink && (
             <>
               <ButtonBasic
+                LeftIcon={<IoMdSettings {...defaultIconProps} />}
                 label="Configurar outra gravação"
                 onClick={handleConfigureNextRecording}
                 width={200}
                 maxWidth={250}
                 labelAlign="center"
               />
-              <ButtonBasic
-                LeftIcon={<BsDownload size={20} color={Theme.pallet.primaryDark} />}
-                label="Baixar Gravação"
-                asLink
-                href={downloadLink}
-                filenameDownload={downloadFileName}
-                width={200}
-                maxWidth={250}
-              />
+              <IconButton size={50} asLink href={downloadLink} filenameDownload={downloadFileName}>
+                <BsDownload {...defaultIconProps} />
+              </IconButton>
             </>
           )}
         </FooterLeftSide>
