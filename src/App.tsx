@@ -28,6 +28,7 @@ import { useRequestWebcamAndMicrophonePermissions, WebcamAndMicrophoneStatuses }
 import AudioControl from 'components/AudioControl';
 import { isMobile } from 'react-device-detect';
 import { ToastContainer } from 'react-toastify';
+import { Helmet } from 'react-helmet';
 
 import 'react-toastify/dist/ReactToastify.css';
 import MobileWarning from 'components/MobileWarning';
@@ -210,6 +211,9 @@ function App() {
   return (
     <Container>
       <ReactTooltip effect="solid" />
+      <Helmet>
+        <title>{isRecordingRunning ? 'Gravando...' : 'WebRecorder'}</title>
+      </Helmet>
       <VideoArea ref={handleVideoAreaRef}>
         {selectedVideo || (isDisplayResult && downloadLink) ? (
           <VideoPlaceholder>
