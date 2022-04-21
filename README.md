@@ -8,5 +8,8 @@
 - [ ] Multilanguage support
 - [ ] Multi video encoding support
 
+## Bugs
+- [ ] Sources not showing correctly after request the permissions
+
 ## Credits
 <a href="https://www.flaticon.com/free-icons/rec" title="rec icons">Rec icons created by kliwir art - Flaticon</a>
