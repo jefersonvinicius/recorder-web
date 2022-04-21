@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/recorder-web/static/css/main.4d2626b8.css",
-    "main.js": "/recorder-web/static/js/main.82a02ac6.js",
+    "main.js": "/recorder-web/static/js/main.fd89c5bd.js",
     "index.html": "/recorder-web/index.html",
     "main.4d2626b8.css.map": "/recorder-web/static/css/main.4d2626b8.css.map",
-    "main.82a02ac6.js.map": "/recorder-web/static/js/main.82a02ac6.js.map"
+    "main.fd89c5bd.js.map": "/recorder-web/static/js/main.fd89c5bd.js.map"
   },
   "entrypoints": [
     "static/css/main.4d2626b8.css",
-    "static/js/main.82a02ac6.js"
+    "static/js/main.fd89c5bd.js"
   ]
 }
