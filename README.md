@@ -1,6 +1,6 @@
 # WebRecorder
 
-The recording application built with web native APIs and ReactJS
+A recording application built with web native APIs and ReactJS
 
 Check out: https://jefersonvinicius.github.io/recorder-web/
 
