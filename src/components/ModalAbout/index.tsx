@@ -37,7 +37,7 @@ export default function ModalAbout({ isOpen, onClose }: Props) {
             <ModalAboutButton onClick={onClose} colorStyle="dark" label="Começar a gravar" labelAlign="center" />
           </ModalAboutContentChild>
           <ModalAboutContentChild>
-            <ModalAboutImg src="%PUBLIC_URL%/imgs/instructions.png" />
+            <ModalAboutImg src={process.env.PUBLIC_URL + '/imgs/instructions.png'} />
           </ModalAboutContentChild>
         </ModalAboutContent>
         <ModalAboutFooter>
