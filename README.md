@@ -5,6 +5,7 @@
 - [x] Select between audio sources
 - [ ] Improve layout before select a video source
 - [ ] Improve feedback when the user try to start recording before select video source
+- [ ] Add CI/CD
 - [ ] Multilanguage support
 - [ ] Multi video encoding support
 
