@@ -1,5 +1,9 @@
 # WebRecorder
 
+The recording application built with web native APIs and ReactJS
+
+Check out: https://jefersonvinicius.github.io/recorder-web/
+
 ## Features
 - [x] Select between video sources
 - [x] Select between audio sources
