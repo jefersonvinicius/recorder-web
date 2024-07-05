@@ -1,9 +1,9 @@
-import ModalSelector from 'components/ModalSelector';
+import ModalSelector from '@app/components/ModalSelector';
 import React, { useCallback } from 'react';
 import { ItemBox, ItemText } from './styles';
 import { CgScreen, CgWebcam } from 'react-icons/cg';
 import { TiMicrophone } from 'react-icons/ti';
-import { screenDevice } from 'utils/devices';
+import { screenDevice } from '@app/utils/devices';
 
 type Props = {
   isOpen: boolean;

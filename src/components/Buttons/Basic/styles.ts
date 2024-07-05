@@ -1,4 +1,4 @@
-import Theme from 'config/theme';
+import Theme from '@app/config/theme';
 import styled from 'styled-components';
 import { ColorStyle } from '.';
 
@@ -8,13 +8,13 @@ export const AsLink = styled.a`
 `;
 
 type ButtonContainerProps = {
-  asLink?: boolean;
-  hasLeftIcon?: boolean;
-  colorStyle?: ColorStyle;
+  $asLink?: boolean;
+  $hasLeftIcon?: boolean;
+  $colorStyle?: ColorStyle;
 };
 
 export const ButtonContainer = styled.button<ButtonContainerProps>`
-  background-color: ${(props) => (props.colorStyle === 'dark' ? Theme.pallet.primaryDark : Theme.pallet.primaryLight)};
+  background-color: ${(props) => (props.$colorStyle === 'dark' ? Theme.pallet.primaryDark : Theme.pallet.primaryLight)};
   border: none;
   display: flex;
   flex-direction: row;
@@ -22,7 +22,7 @@ export const ButtonContainer = styled.button<ButtonContainerProps>`
   justify-content: space-between;
   border-radius: 5px;
   padding: 10px;
-  height: ${(props) => (props.asLink ? '100%' : 'auto')};
+  height: ${(props) => (props.$asLink ? '100%' : 'auto')};
   height: 60px;
 
   &:hover {
@@ -30,7 +30,7 @@ export const ButtonContainer = styled.button<ButtonContainerProps>`
   }
 
   & > span {
-    color: ${(props) => (props.colorStyle === 'dark' ? '#fff' : Theme.pallet.primaryDark)};
+    color: ${(props) => (props.$colorStyle === 'dark' ? '#fff' : Theme.pallet.primaryDark)};
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -39,7 +39,7 @@ export const ButtonContainer = styled.button<ButtonContainerProps>`
     -webkit-box-orient: vertical;
     text-align: left;
     width: 100%;
-    margin-left: ${(props) => (props.hasLeftIcon ? 5 : 0)}px;
+    margin-left: ${(props) => (props.$hasLeftIcon ? 5 : 0)}px;
   }
 
   &:disabled {

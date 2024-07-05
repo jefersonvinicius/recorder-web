@@ -1,5 +1,5 @@
-import ButtonBasic from 'components/Buttons/Basic';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import ButtonBasic from '@app/components/Buttons/Basic';
 import { useAudioInputs, useVideosInputs } from './hooks/media-devices';
 import {
   Container,
@@ -18,23 +18,23 @@ import { BsCameraVideo, BsChevronDown, BsDownload } from 'react-icons/bs';
 import { BiMicrophone } from 'react-icons/bi';
 import { IoMdHelp, IoMdSettings } from 'react-icons/io';
 import { VscClose } from 'react-icons/vsc';
-import Theme from 'config/theme';
-import RecordingButton from 'components/Buttons/RecordingButton';
-import MediaDeviceSelector from 'components/MediaDeviceSelector';
-import ReactTooltip from 'react-tooltip';
-import { useStream } from 'hooks/stream';
-import { getAudioStream, getVideoStream } from 'utils/streams';
-import { useRequestWebcamAndMicrophonePermissions, WebcamAndMicrophoneStatuses } from 'hooks/permissions';
-import AudioControl from 'components/AudioControl';
+import Theme from '@app/config/theme';
+import RecordingButton from '@app/components/Buttons/RecordingButton';
+import MediaDeviceSelector from '@app/components/MediaDeviceSelector';
+import { Tooltip } from 'react-tooltip';
+import { useStream } from '@app/hooks/stream';
+import { getAudioStream, getVideoStream } from '@app/utils/streams';
+import { useRequestWebcamAndMicrophonePermissions, WebcamAndMicrophoneStatuses } from '@app/hooks/permissions';
+import AudioControl from '@app/components/AudioControl';
 import { isMobile } from 'react-device-detect';
 import { ToastContainer } from 'react-toastify';
 import { Helmet } from 'react-helmet';
 
 import 'react-toastify/dist/ReactToastify.css';
-import MobileWarning from 'components/MobileWarning';
-import ModalAbout, { useModalAbout } from 'components/ModalAbout';
-import { useCalculateVideoHeightOnWindowResize } from 'hooks/layout';
-import IconButton from 'components/Buttons/IconButton';
+import MobileWarning from '@app/components/MobileWarning';
+import ModalAbout, { useModalAbout } from '@app/components/ModalAbout';
+import { useCalculateVideoHeightOnWindowResize } from '@app/hooks/layout';
+import IconButton from '@app/components/Buttons/IconButton';
 
 const defaultIconProps = { size: 20, color: Theme.pallet.primaryDark };
 const DownArrayIcon = () => <BsChevronDown {...defaultIconProps} />;
@@ -210,7 +210,7 @@ function App() {
 
   return (
     <Container>
-      <ReactTooltip effect="solid" />
+      <Tooltip id="tooltip" />
       <Helmet>
         <title>{isRecordingRunning ? 'Gravando...' : 'WebRecorder'}</title>
       </Helmet>

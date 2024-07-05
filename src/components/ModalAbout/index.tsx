@@ -1,5 +1,5 @@
-import BaseModal from 'components/BaseModal';
 import React, { useCallback, useEffect, useState } from 'react';
+import BaseModal from '@app/components/BaseModal';
 import {
   ModalAboutButton,
   ModalAboutContainer,
@@ -13,6 +13,8 @@ import {
   ModalAboutTitle,
 } from './styles';
 import { AiFillGithub } from 'react-icons/ai';
+
+import instructionsImg from '@app/assets/imgs/instructions.png';
 
 type Props = {
   isOpen: boolean;
@@ -37,7 +39,7 @@ export default function ModalAbout({ isOpen, onClose }: Props) {
             <ModalAboutButton onClick={onClose} colorStyle="dark" label="Começar a gravar" labelAlign="center" />
           </ModalAboutContentChild>
           <ModalAboutContentChild>
-            <ModalAboutImg src={process.env.PUBLIC_URL + '/imgs/instructions.png'} />
+            <ModalAboutImg src={instructionsImg} />
           </ModalAboutContentChild>
         </ModalAboutContent>
         <ModalAboutFooter>

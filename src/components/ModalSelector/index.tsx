@@ -1,4 +1,4 @@
-import BaseModal from 'components/BaseModal';
+import BaseModal from '@app/components/BaseModal';
 import React, { ReactNode } from 'react';
 import { ModalSelectorContent } from './styles';
 

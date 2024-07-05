@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
-import { useAudioFrequency } from 'hooks/audio';
-import { interpolate } from 'utils/math';
+import { useAudioFrequency } from '@app/hooks/audio';
+import { interpolate } from '@app/utils/math';
 import { AudioControlContainer, AudioControlFrequency } from './styles';
 import { BiMicrophone, BiMicrophoneOff } from 'react-icons/bi';
-import Theme from 'config/theme';
+import Theme from '@app/config/theme';
 
 type Props = {
   stream: MediaStream;

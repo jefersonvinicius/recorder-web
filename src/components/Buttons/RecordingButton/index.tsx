@@ -2,7 +2,7 @@ import React from 'react';
 import { useMemo } from 'react';
 import { Circle, RecordingButtonContainer } from './styles';
 import Lottie from 'react-lottie';
-import * as pulseAnimation from 'lottie/pulse-animation.json';
+import * as pulseAnimation from '@app/lottie/pulse-animation.json';
 
 type Props = React.HTMLAttributes<HTMLButtonElement> & {
   isRecording: boolean;

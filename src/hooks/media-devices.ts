@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { screenDevice } from 'utils/devices';
+import { screenDevice } from '@app/utils/devices';
 
 export function useDevicesSelector(kindToSelect: MediaDeviceKind) {
   const [isLoading, setIsLoading] = useState(true);

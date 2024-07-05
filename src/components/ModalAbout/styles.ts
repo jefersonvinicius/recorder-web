@@ -1,5 +1,5 @@
-import Button from 'components/Buttons/Basic';
-import Theme from 'config/theme';
+import Button from '@app/components/Buttons/Basic';
+import Theme from '@app/config/theme';
 import styled from 'styled-components';
 
 export const ModalAboutContainer = styled.div``;

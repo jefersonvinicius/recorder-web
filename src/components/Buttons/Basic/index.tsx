@@ -43,9 +43,9 @@ export default function Button({
       <ButtonContainer
         onClick={onClickFn}
         disabled={disabled}
-        colorStyle={colorStyle}
-        asLink={asLink}
-        hasLeftIcon={!!LeftIcon}
+        $colorStyle={colorStyle}
+        $asLink={asLink}
+        $hasLeftIcon={!!LeftIcon}
         {...props}
         style={style}
       >

@@ -1,5 +1,5 @@
-import IconButton from 'components/Buttons/IconButton';
-import Theme from 'config/theme';
+import IconButton from '@app/components/Buttons/IconButton';
+import Theme from '@app/config/theme';
 import styled from 'styled-components';
 
 export const VIDEO_AREA_PADDING = 10;

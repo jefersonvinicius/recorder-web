@@ -1,4 +1,4 @@
-import Theme from 'config/theme';
+import Theme from '@app/config/theme';
 import styled from 'styled-components';
 
 export const AudioControlContainer = styled.div`
