@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, ReactNode, useMemo } from 'react';
+import { HTMLAttributes, ReactNode, useMemo } from 'react';
 import { AsLink, ButtonContainer } from './styles';
 
 export type ColorStyle = 'light' | 'dark';
@@ -34,7 +34,6 @@ export default function Button({
   colorStyle = 'light',
   ...props
 }: BasicButtonProps) {
-  console.log(props.style);
   const style = useMemo(() => ({ maxWidth, width, ...props.style }), [maxWidth, width, props.style]);
 
   const content = useMemo(() => {

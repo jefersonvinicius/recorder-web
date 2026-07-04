@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import ButtonBasic from '@app/components/Buttons/Basic';
-import { useAudioInputs, useVideosInputs } from './hooks/media-devices';
+import { useAudioInputs, useVideoInputs } from './hooks/media-devices';
 import {
   Container,
   Footer,
@@ -63,8 +63,8 @@ function App() {
 
   const { modalAboutIsOpen, closeModalAbout, openModalAbout } = useModalAbout();
 
-  const { audioInputs } = useAudioInputs();
-  const { videosInputs } = useVideosInputs();
+  const { audioInputs, refreshAudioInputs } = useAudioInputs();
+  const { videosInputs, refreshVideoInputs } = useVideoInputs();
 
   const status = useRequestWebcamAndMicrophonePermissions();
 

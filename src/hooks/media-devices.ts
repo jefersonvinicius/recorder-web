@@ -5,45 +5,44 @@ export function useDevicesSelector(kindToSelect: MediaDeviceKind) {
   const [isLoading, setIsLoading] = useState(true);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
 
-  const filterDevices = useCallback(
-    (devices: MediaDeviceInfo[]) => {
-      return devices.filter((d) => d.kind === kindToSelect && !!d.label);
-    },
-    [kindToSelect]
-  );
-
-  useEffect(() => {
+  const refreshDevices = useCallback(async () => {
     navigator.mediaDevices
       .enumerateDevices()
       .then((devices) => {
-        setDevices(filterDevices(devices));
+        setDevices(devices.filter((d) => d.kind === kindToSelect && !!d.label));
       })
       .finally(() => {
         setIsLoading(false);
       });
-  }, [filterDevices]);
+  }, [kindToSelect]);
+
+  useEffect(() => {
+    refreshDevices();
+  }, [refreshDevices]);
 
   useEffect(() => {
     function handleDeviceChange() {
-      navigator.mediaDevices.enumerateDevices().then((devices) => {
-        setDevices(filterDevices(devices));
-      });
+      refreshDevices();
     }
 
     navigator.mediaDevices.addEventListener('devicechange', handleDeviceChange);
     return () => navigator.mediaDevices.removeEventListener('devicechange', handleDeviceChange);
-  }, [filterDevices]);
+  }, [refreshDevices]);
 
-  return { isLoading, devices };
+  return { isLoading, devices, refreshDevices };
 }
 
 export function useAudioInputs() {
-  const { devices, ...rest } = useDevicesSelector('audioinput');
-  return { audioInputs: devices, ...rest };
+  const { devices, refreshDevices, isLoading } = useDevicesSelector('audioinput');
+  return { audioInputs: devices, refreshAudioInputs: refreshDevices, isLoadingAudioInputs: isLoading };
 }
 
-export function useVideosInputs() {
-  const { devices, ...rest } = useDevicesSelector('videoinput');
+export function useVideoInputs() {
+  const { devices, isLoading, refreshDevices } = useDevicesSelector('videoinput');
 
-  return { videosInputs: [screenDevice, ...devices], ...rest };
+  return {
+    videosInputs: [screenDevice, ...devices],
+    refreshVideoInputs: refreshDevices,
+    isLoadingVideoInputs: isLoading,
+  };
 }
